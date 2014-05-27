@@ -3,7 +3,7 @@ var socket = io.connect();
 toastr.options = {
       "closeButton": false,
       "debug": false,
-      "positionClass": "toast-top-right",
+      "positionClass": "toast-bottom-right",
       "onclick": null,
       "showDuration": "300",
       "hideDuration": "300",
@@ -132,6 +132,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 	$scope.page.goToChat = function () {
 		$location.hash('chat');
 	    $anchorScroll();
+	    $('#pseudo-name').focus();
 	};
 	$scope.page.rmAccents = function(strAccents) {
 		var strAccents = strAccents.split('');
