@@ -1,0 +1,41 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.full-width {
+	width: 100%;
+}
+
+.well.bertrand {
+	background-color: rgba(255, 245, 5, 0.39); /* jaune */
+}
+.well.constance {
+	background-color: rgba(108, 139, 240, 0.39); /* bleu */
+}
+.well.auriane {
+	background-color: rgba(47, 246, 30, 0.39); /* vert */
+}
+.well.pauline {
+	background-color: rgba(245, 95, 227, 0.39); /* rose */
+}
+.well.florian {
+	background-color: rgba(246, 151, 30, 0.39); /* orange */
+}
+
+.well.quoted {
+	background-color: rgba(184, 252, 255, 0.62);
+}
+.well.notified {
+	background-color: rgba(184, 255, 207, 0.62);
+}
+textarea.form-control {
+	max-width: 100%;
+}
+.zone-message {
+	display: inline-block;
+}

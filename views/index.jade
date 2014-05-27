@@ -1,0 +1,58 @@
+extends dev
+
+block content
+  //sources
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+
+  script(src="//code.jquery.com/jquery-1.11.0.min.js")
+  script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js')
+  script(src="/javascripts/ui-bootstrap-0.11.0.js" type="text/javascript") //stocké en local
+  script(src="/socket.io/socket.io.js")
+  script(type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js")
+  //TOASTR
+  script(src= 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/js/toastr.min.js')
+  link(href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/css/toastr.min.css" type="text/css" rel="stylesheet")
+
+  //Controller
+  script(type="text/javascript" src="/javascripts/client.js")
+  div(ng-controller='chatController')
+    .row
+      .col-sm-10
+        p Les loulouuuuuus
+      .col-sm-2
+        button.btn.btn-default.pull-right(ng-click="collapse.isCollapsed = !collapse.isCollapsed") {{collapse.getText()}}
+    //for logining
+    form
+      .row(ng-if="pseudo.show")
+        .col-sm-6
+          div.form-group.has-feedback.full-width
+            input.form-control(type="text" ng-model="pseudo.name" placeholder="Your name ...")
+            span.glyphicon.form-control-feedback.hide.full-width
+        .col-sm-5
+          div.form-group.has-feedback.full-width
+            input.form-control(type="password" ng-model="pseudo.password" placeholder="Your password ...")
+            span.glyphicon.form-control-feedback.hide.full-width
+        .col-sm-1
+          button.btn.btn-default.pull-right(ng-click="pseudo.checkPwd()" ng-disabled="!canSubmit()") Go!
+
+
+    //for chatting
+    div(ng-if="!pseudo.show" collapse="collapse.isCollapsed")
+      p Your pseudo: {{pseudo.pseudo}}
+      form.form-group.row
+        .col-sm-11
+          //modifier le type d'entree car fenetre ne s'adapte pas si texte long ....
+          textarea.form-control(ng-model="message.content" placeholder="Votre message..." row="2" autofocus autocomplete="off")
+        .col-sm-1
+          button.btn.btn-default.pull-right(ng-click="message.send()") Envoyer!
+      section(id="zone_chat")
+        div(ng-repeat='msg in message.list | limitTo:50 | reverse')
+          //.well.well-sm
+          .well.well-sm(ng-class="msg.css_class") 
+            div.zone-message
+              small.small {{message.getDate(msg.date)}} 
+              div.zone-message
+                strong  {{msg.from}} - 
+                {{msg.content}}
