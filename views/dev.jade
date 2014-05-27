@@ -11,7 +11,7 @@ head
     link(rel='stylesheet', type='text/css', href='css/default.css')
     link(rel='stylesheet', type='text/css', href='css/ipg.css')
     link(rel='stylesheet', type='text/css', href='css/javaeetutorial.css')
-  body
+  body(ng-controller='chatController')
     table(border='0', cellpadding='5', cellspacing='0', width='100%')
       tbody
         tr(valign='top')
@@ -256,7 +256,7 @@ head
                         p.Banner
                           | The Java EE 6 Tutorial
                       td(align='right', valign='bottom')
-                        img(src='graphics/javalogo.png', alt='Java Coffee Cup logo')
+                        img(src='graphics/javalogo.png', alt='Java Coffee Cup logo' ng-click="page.goToChat()")
               .header-links
                 a(href='./index.html') Home
                 | |

@@ -58,11 +58,10 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 
 //socket.io
-var io = require('socket.io').listen(server);
+var io = require('socket.io').listen(server, { log: false });
 io.sockets.on('connection', function (socket) {
-
 	socket.on('message', function (message) {
-		console.log(message);
+		console.log('MSG from: ' + message.from + ' - content: ' + message.content + ' - date: ' +message.date);
 	    socket.broadcast.emit('new_message', message);
 	});
 });

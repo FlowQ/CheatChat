@@ -1,10 +1,15 @@
 Add :
-	- Date 
+	- Typeahead après @
+	- Liste des connectés
+	- historique messages MongoDB 
+	- Système d'inscription
+
+Improve : 
+	- Date
 
 Problems:
 	- accent quand on cite qqun
 	- titre de la page faux dès connexion
-	- send message with enter
 
 ====== 
 
