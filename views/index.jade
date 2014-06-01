@@ -48,12 +48,12 @@ block content
       //the messages are displayed here
       table.table-condensed(id="zone_chat")
         tbody
-          tr(ng-repeat='msg in message.list | reverse | limitTo:50 ' ng-class="msg.css_class")
+          tr(ng-repeat='msg in message.list | reverse | limitTo:50 ')
             //.well.well-sm(ng-class="msg.css_class") 
             td.small {{message.getDate(msg.date)}} 
             td
               strong {{msg.from}}
-            td {{msg.content}}
+            td(ng-class="msg.css_class") {{msg.content}}
       //Backup for the old message displaying
       //- section(id="zone_chat")
       //-   div(ng-repeat='msg in message.list | reverse | limitTo:50 ')
