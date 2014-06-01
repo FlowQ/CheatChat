@@ -27,6 +27,7 @@ app.get('/dev', function(req, res) {
 app.get('/', routes.index);
 app.get('/connection', function(req, res) {
 	var pseudo = 'no';
+	//créer tableau avec prénoms en clef puis valeurs en colonnes (pour ajouter les couleurs)
 	switch(req.query.name) {
 		case 'florian':
 			if(req.query.password == 'popo')
@@ -57,9 +58,34 @@ var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+var list_connected = [];
 //socket.io
 var io = require('socket.io').listen(server, { log: false });
 io.sockets.on('connection', function (socket) {
+	//event when someone connects to inform the others
+	socket.on('connected', function(user) {
+		console.log(user.pseudo + ' is connected');
+		socket.set('pseudo', user.pseudo);
+		if(list_connected.indexOf(user.pseudo) == -1)
+			list_connected.push(user.pseudo);
+		console.log(list_connected);
+		socket.emit('new_user', {list: list_connected});
+		socket.broadcast.emit('new_user', {list: list_connected});
+	});
+	//event when someone disconnects, to inform the others
+	socket.on('disconnect', function(user) {
+		socket.get('pseudo', function (error, pseudo) {
+			console.log(pseudo + ' is disconnected');
+
+			var index = list_connected.indexOf(pseudo);
+			if(index == -1) {
+				console.log(' ========== ERROR ============= ');
+			} else {
+				list_connected.splice(index, 1);
+			}
+			socket.broadcast.emit('gone_user', {list: list_connected});
+		});
+	});
 	socket.on('message', function (message) {
 		console.log('MSG from: ' + message.from + ' - content: ' + message.content + ' - date: ' +message.date);
 	    socket.broadcast.emit('new_message', message);

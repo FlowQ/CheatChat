@@ -53,11 +53,14 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
 				});
+				socket.emit('connected', {pseudo: $scope.pseudo.pseudo});
 				toastr.success('Bienvenue ' + $scope.pseudo.pseudo + ', la forme ?');
 				setTimeout(function() { $('textarea.form-control').focus(); }, 150);
 				setTimeout(function() { toastr.clear();document.title = toastr.options.ex_title; }, 2500);
 			}
 			else {
+				$scope.pseudo.password = null;
+				$('#password').focus();
 				$('div.form-group.has-feedback.full-width').addClass("has-error");
 				toastr.error('Mauvaise authentification');
 				setTimeout(function() { toastr.clear();document.title = toastr.options.ex_title; }, 1500);
@@ -90,13 +93,14 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		//, css_class: $scope.pseudo.name to add personnalize CSS 
 		var msg = {from: $scope.pseudo.pseudo, content: $scope.message.content, date: now}
 		socket.emit('message', msg);
+		msg.from = 'Moi';
 		$scope.message.list.push(msg);
 		$scope.message.content = null;
 	};
 
 
 	$scope.message.getDate = function(date) {
-			return moment(date).format('HH:mm');
+		return moment(date).format('HH:mm');
 	};
 
 	socket.on('new_message', function(data) {
@@ -104,13 +108,6 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		var pseudo = $scope.pseudo.pseudo;
 		var pseudo_woacc = $scope.page.rmAccents(pseudo);
 		var text_lowered = data.content.toLowerCase();
-
-		// if(text_lowered.indexOf('@' + ($scope.pseudo.pseudo).toLowerCase()) > -1) {
-		// 	var index = text_lowered.indexOf('@' + ($scope.pseudo.pseudo).toLowerCase()) + 2 + ($scope.pseudo.pseudo.length);
-		// 	var shift = data.content.slice(index, index + 25);
-		// 	toastr.success('<p>Tu as été mentionné par ' + data.from + '!</p><p>"<i>' + shift + ' ...</i>"</p><small>' + moment().format('HH:mm') + '</small>');
-		// 	data.css_class = 'notified';
-		// } else {
 
 		if((text_lowered.indexOf('@' + (pseudo).toLowerCase()) > -1) || (text_lowered.indexOf('@' + (pseudo_woacc).toLowerCase()) > -1)) {
 			var index = text_lowered.indexOf('@' + (pseudo).toLowerCase()) + 2 + (pseudo.length);
@@ -128,27 +125,55 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		});
 	});
 
-	$scope.page = {};
-	$scope.page.goToChat = function () {
-		$location.hash('chat');
-	    $anchorScroll();
-	    $('#pseudo-name').focus();
-	};
-	$scope.page.rmAccents = function(strAccents) {
-		var strAccents = strAccents.split('');
-		var strAccentsOut = new Array();
-		var strAccentsLen = strAccents.length;
-		var accents = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
-		var accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
-		for (var y = 0; y < strAccentsLen; y++) {
-			if (accents.indexOf(strAccents[y]) != -1) {
-				strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
-			} else
-				strAccentsOut[y] = strAccents[y];
+	$scope.users = {};
+	$scope.users.list = [];
+	$scope.users.toShow = '';
+	$scope.users.updateList = function () {
+		var res = '';
+		for(var nom in $scope.users.list){
+			console.log($scope.users.list[nom]);
+			if($scope.users.list[nom] != 'null' && $scope.users.list[nom] != $scope.pseudo.pseudo)
+				res = res.concat($scope.users.list[nom], ' ');
 		}
-		strAccentsOut = strAccentsOut.join('');
-		return strAccentsOut;
+		$scope.users.toShow = res;
 	}
+	socket.on('new_user', function (data) {
+		$scope.$apply(function () {
+			$scope.users.list = data.list;
+			$scope.users.updateList();
+		});
+		console.log($scope.users.toShow);
+	});
+	socket.on('gone_user', function (data) {
+		$scope.$apply(function () {
+			$scope.users.list = data.list;
+			$scope.users.updateList();
+		});
+		console.log($scope.users.toShow);
+	})
+
+
+	$scope.page = {};
+		$scope.page.goToChat = function () {
+			$location.hash('chat');
+		    $anchorScroll();
+		    $('#pseudo-name').focus();
+		};
+		$scope.page.rmAccents = function(strAccents) {
+			var strAccents = strAccents.split('');
+			var strAccentsOut = new Array();
+			var strAccentsLen = strAccents.length;
+			var accents = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
+			var accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
+			for (var y = 0; y < strAccentsLen; y++) {
+				if (accents.indexOf(strAccents[y]) != -1) {
+					strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
+				} else
+					strAccentsOut[y] = strAccents[y];
+			}
+			strAccentsOut = strAccentsOut.join('');
+			return strAccentsOut;
+		}
 });
 /* for time in message
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
