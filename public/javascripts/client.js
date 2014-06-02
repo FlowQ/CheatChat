@@ -106,12 +106,12 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		$scope.message.newMessage(data);
 	});
 	$scope.message.newMessage = function (data) {
-		console.log('focus ' + $('textarea.form-control').is(':focus'));
+		if($('textarea.form-control').is(':focus') == false); //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
+			$scope.message.newCount++;
 		//quand quelqu'un te notifie dans la conversation
 		var pseudo = $scope.pseudo.pseudo;
 		var pseudo_woacc = $scope.page.rmAccents(pseudo);
 		var text_lowered = data.content.toLowerCase();
-		$scope.message.newCount++;
 
 		if((text_lowered.indexOf('@' + (pseudo).toLowerCase()) > -1) || (text_lowered.indexOf('@' + (pseudo_woacc).toLowerCase()) > -1)) {
 			var index = text_lowered.indexOf('@' + (pseudo).toLowerCase()) + 2 + (pseudo.length);
