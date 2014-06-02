@@ -31,7 +31,6 @@ ChatApp.filter('reverse', function() {
 });
 ChatApp.controller('chatController', function($scope, $location, $anchorScroll) {
 
-	//TO UN-COMMENT
 	//for managing pseudo and connection
 	$scope.pseudo = {};
 	$scope.pseudo.show = true;
@@ -55,7 +54,6 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 				});
 				socket.emit('connected', {pseudo: $scope.pseudo.pseudo});
 				toastr.success('Bienvenue ' + $scope.pseudo.pseudo + ', la forme ?');
-				setTimeout(function() { $('textarea.form-control').focus(); }, 150);
 				setTimeout(function() { toastr.clear();document.title = toastr.options.ex_title; }, 2500);
 			}
 			else {
@@ -73,10 +71,6 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 			$scope.message.newMessage(message);
 		});
 	});
-	
-	//TEMP
-	// $scope.pseudo = {pseudo: 'Flow', show: false, name: 'florian'};
-	// socket.emit('send');
 
 	//for managing messages
 	$scope.collapse = {};
@@ -112,6 +106,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		$scope.message.newMessage(data);
 	});
 	$scope.message.newMessage = function (data) {
+		console.log('focus ' + $('textarea.form-control').is(':focus'));
 		//quand quelqu'un te notifie dans la conversation
 		var pseudo = $scope.pseudo.pseudo;
 		var pseudo_woacc = $scope.page.rmAccents(pseudo);

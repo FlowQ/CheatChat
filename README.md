@@ -16,6 +16,7 @@ Improve :
 	- Date
 	- Liste des connectés
 	- historique messages MongoDB 
+	- quand messages reçu et que sur la page avec déjà le focus -> ne pas changer le titre
 
 Problems:
 
