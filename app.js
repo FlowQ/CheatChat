@@ -47,6 +47,10 @@ app.get('/connection', function(req, res) {
 			if(req.query.password == 'tennis')
 				pseudo = 'Pépé';
 			break;
+		case 'zakaria':
+			if(req.query.password == 'bienoubien')
+				pseudo = 'Zak';
+			break;
 		default: pseudo = 'no';
 	}
 	res.send({pseudo: pseudo});
