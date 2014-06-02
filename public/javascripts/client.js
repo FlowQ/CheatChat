@@ -106,6 +106,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		$scope.message.newMessage(data);
 	});
 	$scope.message.newMessage = function (data) {
+		console.log('focus: ' + $('textarea.form-control').is(':focus'));
 		if($('textarea.form-control').is(':focus') == false); //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
 			$scope.message.newCount++;
 		//quand quelqu'un te notifie dans la conversation
@@ -130,6 +131,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 	};
 	$scope.message.newCount = 0;
 	setInterval(function(){
+		console.log(new Date() + ' ' + $scope.message.newCount);
 		if(document.title != toastr.options.ex_title || $scope.message.newCount == 0) 
 				document.title = toastr.options.ex_title;
 		else {
