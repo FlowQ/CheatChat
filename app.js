@@ -1,5 +1,5 @@
 var express = require('express');
-var routes = require('./controllers/index');
+var routes = require('./controllers/routes');
 var http = require('http');
 var path = require('path');
 
@@ -21,9 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-app.get('/dev', function(req, res) {
-	res.render('dev');
-});
+app.get('/m', routes.mobile);
 app.get('/', routes.index);
 app.get('/connection', function(req, res) {
 	var pseudo = 'no';
