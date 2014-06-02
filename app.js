@@ -22,8 +22,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+  console.log('DEV');
 }
+
+app.configure('development', function() {
+	app.use(express.errorHandler());
+	console.log('DEVE');
+	mongoose.connect('mongodb://localhost/cheatchat', function(err) {
+	  if (err) { throw err; }
+	  else console.log('Okay mongoose');
+	});
+});
+
+app.configure('production', function() {
+  mongoose.connect(process.env.MONGOLAB_URI + '/cheatchat', function(err) {
+	  if (err) { throw err; }
+	  else console.log('Okay mongoose');
+	});
+});
+
 app.get('/m', routes.mobile);
 app.get('/', routes.index);
 app.get('/connection', function(req, res) {
@@ -66,10 +83,6 @@ app.get('/connection', function(req, res) {
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
-});
-mongoose.connect('mongodb://localhost/cheatchat', function(err) {
-  if (err) { throw err; }
-  else console.log('Okay mongoose');
 });
 
 var list_connected = [];
