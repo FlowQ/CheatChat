@@ -86,9 +86,9 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 
 var list_connected = [];
-//socket.io
-var io = require('socket.io').listen(server, { log: false });
-io.sockets.on('connection', function (socket) {
+// //socket.io
+var io = require('socket.io')(server);
+io.on('connection', function (socket) {
 	//event when someone connects to inform the others
 	//db.messages.find().sort({date: -1}).limit(3).pretty()
 	socket.on('connected', function(user) {
@@ -96,7 +96,7 @@ io.sockets.on('connection', function (socket) {
 			socket.emit('old_messages', {listMsg: res});
 		});
 		console.log(user.pseudo + ' is connected');
-		socket.set('pseudo', user.pseudo);
+		socket.pseudo = user.pseudo;
 		if(list_connected.indexOf(user.pseudo) == -1)
 			list_connected.push(user.pseudo);
 		console.log(list_connected);
@@ -105,23 +105,22 @@ io.sockets.on('connection', function (socket) {
 	});
 	//event when someone disconnects, to inform the others
 	socket.on('disconnect', function(user) {
-		socket.get('pseudo', function (error, pseudo) {
-			console.log(pseudo + ' is disconnected');
+		var pseudo = socket.pseudo;
+		console.log(pseudo + ' is disconnected');
 
-			var usr = new User({name: pseudo, action: 'log-out', date: new Date()});
-			usr.save(function(error) {
-				if(error)
-					console.log('Error log-out saving');
-			});
-
-			var index = list_connected.indexOf(pseudo);
-			if(index == -1) {
-				console.log(' ========== ERROR ============= ');
-			} else {
-				list_connected.splice(index, 1);
-			}
-			socket.broadcast.emit('gone_user', {list: list_connected});
+		var usr = new User({name: pseudo, action: 'log-out', date: new Date()});
+		usr.save(function(error) {
+			if(error)
+				console.log('Error log-out saving');
 		});
+
+		var index = list_connected.indexOf(pseudo);
+		if(index == -1) {
+			console.log(' ========== ERROR ============= ');
+		} else {
+			list_connected.splice(index, 1);
+		}
+		socket.broadcast.emit('gone_user', {list: list_connected});
 	});
 	socket.on('message', function (message) {
 		console.log('MSG from: ' + message.from + ' - content: ' + message.content + ' - date: ' +message.date);
@@ -129,7 +128,53 @@ io.sockets.on('connection', function (socket) {
 		saveMsg.save(function(error) {
 			if(error)
 				console.log("Saving message err: " + error);
-		})
+		});
 	    socket.broadcast.emit('new_message', message);
 	});
 });
+// var io = require('socket.io').listen(server, { log: false });
+// io.sockets.on('connection', function (socket) {
+// 	//event when someone connects to inform the others
+// 	//db.messages.find().sort({date: -1}).limit(3).pretty()
+// 	socket.on('connected', function(user) {
+// 		msg.find().sort({date: -1}).limit(40).exec(function(err, res) {
+// 			socket.emit('old_messages', {listMsg: res});
+// 		});
+// 		console.log(user.pseudo + ' is connected');
+// 		socket.set('pseudo', user.pseudo);
+// 		if(list_connected.indexOf(user.pseudo) == -1)
+// 			list_connected.push(user.pseudo);
+// 		console.log(list_connected);
+// 		socket.emit('new_user', {list: list_connected});
+// 		socket.broadcast.emit('new_user', {list: list_connected});
+// 	});
+// 	//event when someone disconnects, to inform the others
+// 	socket.on('disconnect', function(user) {
+// 		socket.get('pseudo', function (error, pseudo) {
+// 			console.log(pseudo + ' is disconnected');
+
+// 			var usr = new User({name: pseudo, action: 'log-out', date: new Date()});
+// 			usr.save(function(error) {
+// 				if(error)
+// 					console.log('Error log-out saving');
+// 			});
+
+// 			var index = list_connected.indexOf(pseudo);
+// 			if(index == -1) {
+// 				console.log(' ========== ERROR ============= ');
+// 			} else {
+// 				list_connected.splice(index, 1);
+// 			}
+// 			socket.broadcast.emit('gone_user', {list: list_connected});
+// 		});
+// 	});
+// 	socket.on('message', function (message) {
+// 		console.log('MSG from: ' + message.from + ' - content: ' + message.content + ' - date: ' +message.date);
+// 		var saveMsg = new msg(message);
+// 		saveMsg.save(function(error) {
+// 			if(error)
+// 				console.log("Saving message err: " + error);
+// 		})
+// 	    socket.broadcast.emit('new_message', message);
+// 	});
+// });
