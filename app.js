@@ -1,5 +1,8 @@
 var express = require('express');
 var routes = require('./controllers/routes');
+var mongoose = require('mongoose');
+var msg = require('./models/message').Message
+var usr = require('./models/user').User
 var http = require('http');
 var path = require('path');
 
@@ -29,7 +32,7 @@ app.get('/connection', function(req, res) {
 	switch(req.query.name) {
 		case 'florian':
 			if(req.query.password == 'popo')
-				pseudo = 'Flow';
+				pseudo = 'Flo';
 			break;
 		case 'constance':
 			if(req.query.password == 'pokipoki')
@@ -53,11 +56,20 @@ app.get('/connection', function(req, res) {
 			break;
 		default: pseudo = 'no';
 	}
+	var usr = new User({name: pseudo, action: 'log-in', date: new Date()});
+	usr.save(function(error) {
+		if(error)
+			console.log('Error log-in saving');
+	});
 	res.send({pseudo: pseudo});
 });
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+});
+mongoose.connect('mongodb://localhost/cheatchat', function(err) {
+  if (err) { throw err; }
+  else console.log('Okay mongoose');
 });
 
 var list_connected = [];
@@ -65,7 +77,11 @@ var list_connected = [];
 var io = require('socket.io').listen(server, { log: false });
 io.sockets.on('connection', function (socket) {
 	//event when someone connects to inform the others
+	//db.messages.find().sort({date: -1}).limit(3).pretty()
 	socket.on('connected', function(user) {
+		msg.find().sort({date: -1}).limit(40).exec(function(err, res) {
+			socket.emit('old_messages', {listMsg: res});
+		});
 		console.log(user.pseudo + ' is connected');
 		socket.set('pseudo', user.pseudo);
 		if(list_connected.indexOf(user.pseudo) == -1)
@@ -79,6 +95,12 @@ io.sockets.on('connection', function (socket) {
 		socket.get('pseudo', function (error, pseudo) {
 			console.log(pseudo + ' is disconnected');
 
+			var usr = new User({name: pseudo, action: 'log-out', date: new Date()});
+			usr.save(function(error) {
+				if(error)
+					console.log('Error log-out saving');
+			});
+
 			var index = list_connected.indexOf(pseudo);
 			if(index == -1) {
 				console.log(' ========== ERROR ============= ');
@@ -90,6 +112,11 @@ io.sockets.on('connection', function (socket) {
 	});
 	socket.on('message', function (message) {
 		console.log('MSG from: ' + message.from + ' - content: ' + message.content + ' - date: ' +message.date);
+		var saveMsg = new msg(message);
+		saveMsg.save(function(error) {
+			if(error)
+				console.log("Saving message err: " + error);
+		})
 	    socket.broadcast.emit('new_message', message);
 	});
 });

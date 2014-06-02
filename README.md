@@ -2,8 +2,6 @@
 
 Add :
 	- Typeahead après @
-	- Liste des connectés
-	- historique messages MongoDB 
 	- Système d'inscription
 	- son quand mentionné
 	- changer son pseudo / mdp
@@ -11,13 +9,15 @@ Add :
 	- comtper les gros mots => boite à gros mots
 	- gérer le code
 	- crypter les messages
+	- kick / ban
+	- Radio collaborative
 
 Improve : 
 	- Date
+	- Liste des connectés
+	- historique messages MongoDB 
 
 Problems:
-	- 50 messages ça plante (looks OKAY 28/05 11:38 en local)
-	- messages vicdes
 
 ====== 
 
