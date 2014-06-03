@@ -54,7 +54,7 @@ app.get('/connection', function(req, res) {
 				pseudo = 'Bru';
 			break;
 		case 'pauline':
-			if(req.query.password == 'coucou')
+			if(req.query.password == 'constance')
 				pseudo = 'Popy';
 			break;
 		case 'bertrand':

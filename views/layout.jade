@@ -1,6 +1,6 @@
 doctype html
-html(ng-app="ChatApp")
+html(ng-app="ChatApp" ng-controller='chatController' ng-keyup="collapse.escape($event)")
   head
   
-  body(ng-controller='chatController')
+  body
     block content

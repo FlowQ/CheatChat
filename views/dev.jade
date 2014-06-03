@@ -1,5 +1,5 @@
 doctype html
-html(lang='en-US' ng-app="ChatApp")
+html(lang='en-US' ng-app="ChatApp" ng-controller='chatController' ng-keyup="collapse.escape($event)")
 head
     //
        GenHTML revision 25226
@@ -11,7 +11,7 @@ head
     link(rel='stylesheet', type='text/css', href='css/default.css')
     link(rel='stylesheet', type='text/css', href='css/ipg.css')
     link(rel='stylesheet', type='text/css', href='css/javaeetutorial.css')
-  body(ng-controller='chatController')
+  body
     table(border='0', cellpadding='5', cellspacing='0', width='100%')
       tbody
         tr(valign='top')
