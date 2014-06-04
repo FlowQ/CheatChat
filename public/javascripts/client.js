@@ -141,8 +141,6 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 					} else {
 						if((text_lowered.indexOf('@boloss') > -1) && (pseudo == 'Bru' || pseudo == 'Pépé')) {
 							data.css_class = 'boloss';
-						} else {
-							console.log('else');
 							toastr.info('Ouesh les bolossss vous êtes où ?!');
 						}
 					}
