@@ -137,11 +137,13 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 					if((text_lowered.indexOf('@geek') > -1) && (pseudo == 'Popy' || pseudo == 'Cons' || pseudo == 'Flo')) {
 						data.css_class = 'geek';
 						console.log('geek');
+						toastr.success('Hey Ho les geeks on vous appelle!');
 					} else {
 						if((text_lowered.indexOf('@boloss') > -1) && (pseudo == 'Bru' || pseudo == 'Pépé')) {
 							data.css_class = 'boloss';
 						} else {
 							console.log('else');
+							toastr.info('Ouesh les bolossss vous êtes où ?!');
 						}
 					}
 				}
