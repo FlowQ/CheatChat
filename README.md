@@ -8,7 +8,7 @@ Add :
 	- grouper quand plusieurs d'affilé du même expéditeur
 	- comtper les gros mots => boite à gros mots
 	- gérer le code
-	- crypter les messages
+	- crypter les messages	== V || X
 	- kick / ban
 	- Radio collaborative
 

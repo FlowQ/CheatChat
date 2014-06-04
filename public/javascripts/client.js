@@ -1,5 +1,5 @@
 // connect to the socket server
-var socket = io.connect();
+var socket = io.connect({secure: true});
 toastr.options = {
       "closeButton": false,
       "debug": false,
@@ -21,6 +21,7 @@ toastr.options.onShown = function() {
 toastr.options.onHidden  = function() { 
 	document.title = toastr.options.ex_title; 
 }
+var messageSound = new Audio("double_notif.mp3");
 
 var ChatApp = angular.module('ChatApp', ['ui.bootstrap']);
 //to reverse the order of the messages
@@ -46,7 +47,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
         }
 	};
 	$scope.pseudo.checkPwd = function () {
-		$.get('/connection', {name: ($scope.pseudo.name).toLowerCase().trim(), password: $scope.pseudo.password}, function(result) {
+		$.post('/connection', {name: ($scope.pseudo.name).toLowerCase().trim(), password: $scope.pseudo.password}, function(result) {
 			if(result.pseudo != 'no') {
 				$scope.$apply(function() {
 					$scope.pseudo.show = false;
@@ -81,10 +82,6 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		else
 			return 'Hide';
 	};
-	$scope.collapse.escape = function (key) {
-		if(key.keyCode == 27)
-			$scope.collapse.isCollapsed = !$scope.collapse.isCollapsed;
-	};
 
 	$scope.message = {};
 	$scope.message.list = [];
@@ -105,12 +102,17 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		$scope.message.content = null;
 	};
 	$scope.message.getDate = function(date) {
-		return moment(date).format('HH:mm');
+		if(date == 'hier')
+			return date;
+		else
+			return moment(date).format('HH:mm');
 	};
 	socket.on('new_message', function(data) {
 		$scope.message.newMessage(data);
 	});
 	$scope.message.newMessage = function (data) {
+		if($scope.message.newCount < 5 && $scope.sound.play) //pour ne pas harceler
+			messageSound.play();
 		if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
 			$scope.message.newCount++;
 		//quand quelqu'un te notifie dans la conversation
@@ -127,6 +129,10 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 			//juste cité
 			if((text_lowered.indexOf((pseudo).toLowerCase()) > -1) || (text_lowered.indexOf((pseudo_woacc).toLowerCase()) > -1)) {
 				data.css_class = 'quoted';
+			} else {
+				if((text_lowered.indexOf('@timmy') > -1) && pseudo == 'Pépé') {
+					$scope.message.newMessage( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
+				}
 			}
 		}
 		$scope.$apply(function() {
@@ -170,10 +176,35 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 			$scope.users.list = data.list;
 			$scope.users.updateList();
 		});
-	})
+	});
+
+	socket.on('kick', function(data) {
+		console.log('here');
+		var d = new Date();
+		console.log(data.name + ' ' + $scope.pseudo.pseudo);
+		if(data.name.toLowerCase() == $scope.pseudo.pseudo.toLowerCase()) {
+			toastr.error("BIM DEHORS BIATCH :D");
+			toastr.error("T'as la mort hein!");
+			toastr.error("Ahahahahahah");
+			setTimeout(function() { location.reload(true); }, 7000);
+		}
+		else {
+			$scope.message.newMessage({from: 'Master', content: data.name + " s'est fait kicker, bouyaa!", date: d});
+		}
+	});
 
 
 	$scope.page = {};
+	$scope.page.keyPress = function (key) {
+		if(key.keyCode == 27)
+			$scope.collapse.isCollapsed = !$scope.collapse.isCollapsed;
+		if(($('textarea.form-control').is(':focus') == false) && key.keyCode == 65)
+			$scope.page.plcmtPopy();
+	};
+	$scope.page.plcmtPopy = function () {
+		$location.hash('txtArea');
+	    $anchorScroll();
+	}
 	$scope.page.goToChat = function () {
 		$location.hash('chat');
 	    $anchorScroll();
@@ -197,6 +228,20 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 	$scope.page.hasFocus = function () {
 		$scope.message.newCount = 0;
 		document.title = toastr.options.ex_title;
+	};
+
+	$scope.sound = {};
+	$scope.sound.ok = 'img/sound.png';
+	$scope.sound.mute = 'img/mute.png';
+	$scope.sound.img = $scope.sound.ok;
+	$scope.sound.play = true;
+	$scope.sound.click = function () {
+		if($scope.sound.play) {
+			$scope.sound.img = $scope.sound.mute;
+		}else {
+			$scope.sound.img = $scope.sound.ok;
+		}
+		$scope.sound.play = !$scope.sound.play;
 	};
 });
 /* for time in message
