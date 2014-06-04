@@ -120,6 +120,7 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 		var pseudo_woacc = $scope.page.rmAccents(pseudo);
 		var text_lowered = data.content.toLowerCase();
 
+		//règles d'affichage des @lias 
 		if((text_lowered.indexOf('@' + (pseudo).toLowerCase()) > -1) || (text_lowered.indexOf('@' + (pseudo_woacc).toLowerCase()) > -1)) {
 			var index = text_lowered.indexOf('@' + (pseudo).toLowerCase()) + 2 + (pseudo.length);
 			var shift = data.content.slice(index, index + 25);
@@ -132,6 +133,17 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 			} else {
 				if((text_lowered.indexOf('@timmy') > -1) && pseudo == 'Pépé') {
 					$scope.message.newMessage( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
+				} else {
+					if((text_lowered.indexOf('@geek') > -1) && (pseudo == 'Popy' || pseudo == 'Cons' || pseudo == 'Flo')) {
+						data.css_class = 'geek';
+						console.log('geek');
+					} else {
+						if((text_lowered.indexOf('@boloss') > -1) && (pseudo == 'Bru' || pseudo == 'Pépé')) {
+							data.css_class = 'boloss';
+						} else {
+							console.log('else');
+						}
+					}
 				}
 			}
 		}

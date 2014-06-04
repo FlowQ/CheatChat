@@ -52,6 +52,12 @@ textarea.form-control {
 .notified {
 	color: #96E476;
 }
+.boloss {
+	color: rgba(171, 194, 97, 1);
+}
+.geek {
+	color: rgba(255, 102, 102, 1);
+}
 
 @media screen and (max-width: 768px){
 	.btn.btn-default.pull-right {
