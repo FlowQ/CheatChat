@@ -3,21 +3,29 @@
 Add :
 	- Typeahead après @
 	- Système d'inscription
-	- son quand mentionné
 	- changer son pseudo / mdp
 	- grouper quand plusieurs d'affilé du même expéditeur
 	- comtper les gros mots => boite à gros mots
 	- gérer le code
-	- crypter les messages	== V || X
-	- kick / ban
 	- Radio collaborative
+	- distribuer des médailles
+	- coeur <3 keur en rose 
+	- backdoor déco tout le monde
+	
 
 Improve : 
 	- Date
 	- Liste des connectés
 	- historique messages MongoDB 
+	- kick 
+	- son quand mentionné
 
 Problems:
+	- crypter les messages	== V || X à checker
+
+Done: 
+	- logs des erreurs JS
+
 
 ====== 
 
@@ -26,3 +34,4 @@ Pour Constance :
 
 Pour Popy : 
 	- Wikipedia => Accenture
+

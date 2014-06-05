@@ -1,5 +1,9 @@
 // connect to the socket server
 var socket = io.connect({secure: true});
+window.onerror = function(error, url, line) {
+	var d = new Date();
+    socket.emit('logs', {type: 'browser', error: error,url: url, line: line, date: d});
+};
 toastr.options = {
       "closeButton": false,
       "debug": false,
@@ -23,14 +27,14 @@ toastr.options.onHidden  = function() {
 }
 var messageSound = new Audio("double_notif.mp3");
 
-var ChatApp = angular.module('ChatApp', ['ui.bootstrap']);
+var ChatApp = angular.module('ChatApp', ['ui.bootstrap', 'ngSanitize']);
 //to reverse the order of the messages
 ChatApp.filter('reverse', function() {
   return function(items) {
     return items.slice().reverse();
   };
 });
-ChatApp.controller('chatController', function($scope, $location, $anchorScroll) {
+ChatApp.controller('chatController', function($scope, $sce, $location, $anchorScroll) {
 
 	//for managing pseudo and connection
 	$scope.pseudo = {};
@@ -147,10 +151,39 @@ ChatApp.controller('chatController', function($scope, $location, $anchorScroll) 
 				}
 			}
 		}
+		var index = text_lowered.indexOf('http://');
+		var index_s = text_lowered.indexOf('https://');
+		if(index > -1 ||  index_s > -1) {
+			var id = null;
+			if(index > index_s)
+				id = index;
+			else
+				id = index_s;
+			after = data.content.slice(id);
+			before = data.content.slice(0, id );
+			id = after.indexOf(' ');
+			var after_http = null;
+			var after_other = null;
+			if(id != -1) {
+				after_http = after.slice(0, id);
+				after_other = after.slice(id);
+			} else { 
+				after_http = after;
+				after_other = '';
+			}
+			data.content = before + ' <a href="' + after_http + '" target="_blank">' + after_http + '</a>' + after_other;
+
+			console.log(data.content);
+		}
+		data.content = $scope.message.trustHTML(data.content);
 		$scope.$apply(function() {
 			$scope.message.list.push(data);
 		});
 	};
+	$scope.message.trustHTML = function (snippet) {
+		console.log('HERE');
+		return $sce.trustAsHtml(snippet);
+	}
 	$scope.message.newCount = 0;
 	setInterval(function(){
 		if(document.title != toastr.options.ex_title || $scope.message.newCount == 0) 

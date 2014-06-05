@@ -6,7 +6,8 @@ block content
 
   script(src="//code.jquery.com/jquery-1.11.0.min.js")
   script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js')
+  script(src='http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular.min.js')
+  script(src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular-sanitize.js")
   script(src="/javascripts/ui-bootstrap-0.11.0.js" type="text/javascript") //stocké en local
   script(src="/socket.io/socket.io.js")
   script(type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js")
@@ -49,21 +50,11 @@ block content
       table.table-condensed(id="zone_chat")
         tbody
           tr(ng-repeat='msg in message.list | reverse | limitTo:50 ')
-            //.well.well-sm(ng-class="msg.css_class") 
             td.small {{message.getDate(msg.date)}} 
             td
               strong {{msg.from}}
-            td(ng-class="msg.css_class") {{msg.content}}
-      //Backup for the old message displaying
-      //- section(id="zone_chat")
-      //-   div(ng-repeat='msg in message.list | reverse | limitTo:50 ')
-      //-     //.well.well-sm
-      //-     .well.well-sm(ng-class="msg.css_class") 
-      //-       div.zone-message
-      //-         small.small {{message.getDate(msg.date)}} 
-      //-         div.zone-message
-      //-           strong  {{msg.from}} - 
-      //-           {{msg.content}}
+            td(ng-class="msg.css_class")
+              p(ng-bind-html="msg.content")
   br
   br
   br

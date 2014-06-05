@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var msg = require('./models/message').Message
 var usr = require('./models/user').User
 var kck = require('./models/kick').Kick
+var log = require('./models/log').Log
 var http = require('http');
 var path = require('path');
 
@@ -34,6 +35,18 @@ app.configure('production', function() {
 	  if (err) { throw err; }
 	  else console.log('Okay mongoose');
 	});
+});
+
+//catches all unknown errors 
+process.on('uncaughtException', function(err) {
+  var d = new Date();
+  var saveLog = new log({type: 'server', error: err,date: d});
+  saveLog.save(function(error) {
+  	if(error)
+  		console.log('Error saving log: ' + error);
+  });
+  console.log('Caught exception: ' + err);
+  process.exit(0);
 });
 
 app.get('/m', routes.mobile);
@@ -86,11 +99,20 @@ var usernames = {};
 // //socket.io
 var io = require('socket.io')(server);
 io.on('connection', function (socket) {
+	socket.secure = true;
 	var addedUser = false;
-
+	socket.on('logs', function(data) {
+		console.log('log error');
+		var saveLog = new log(data);
+		saveLog.save(function(error) {
+			if(error)
+				console.log("Saving log err: " + error);
+		});
+	});
 	socket.on('connected', function(user) {
 		socket.pseudo = user.pseudo;
-		usernames[user.pseudo] = user.pseudo;
+		usernames[user.pseudo] = user.pseudo;
+
 		addedUser = true;
 
 		msg.find().sort({date: -1}).limit(40).exec(function(err, res) {
