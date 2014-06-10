@@ -164,6 +164,9 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			if(data.from != 'Moi')
 				toastr.info('Ouesh les bolossss vous êtes où ?!');
 		}
+		if(text_lowered.indexOf('/bite') > -1) {
+			data = {from: 'The Master', content: "Suce ma biiiiite", date: 'demain'};
+		}
 
 		var index = text_lowered.indexOf('http://');
 		var index_s = text_lowered.indexOf('https://');

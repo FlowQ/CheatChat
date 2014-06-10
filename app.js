@@ -185,9 +185,6 @@ io.on('connection', function (socket) {
 				});
 			}
 		}
-		if(message.content.indexOf('/bite') > -1) {
-			message = {from: 'The Master', content: "Suce ma bite", date: 'demain'};
-		}
 
 	    socket.broadcast.emit('new_message', message);
 
