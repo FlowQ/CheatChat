@@ -18,7 +18,7 @@ Improve :
 	- historique messages MongoDB 
 	- kick 
 	- son quand mentionné
-	- changer son pseudo
+	- changer son pseudo (go to chat auto with special url)
 
 Problems:
 	- crypter les messages	

@@ -126,11 +126,16 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 		var msg = $scope.message.applyActions(data);
 
+		msg.content = $scope.message.lineBreaks(msg.content);
 		msg.content = $scope.message.trustHTML(msg.content);
 		$scope.$apply(function() {
 			$scope.message.list.push(msg);
 		});
 	};
+	$scope.message.lineBreaks = function (content) {
+		var replaced = '<p>' + content + '</p>';
+		return replaced.replace(/\n/g, '</p><p>');
+	}
 	$scope.message.applyActions = function (data) {
 		
 		//quand quelqu'un te notifie dans la conversation
