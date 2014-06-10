@@ -58,7 +58,7 @@ app.post('/connection', function(req, res) {
 	var pseudo = 'no';
 
 	usr.find({login: req.body.name}).limit(1).exec(function(err, data) {
-		if(data[0].password == req.body.password) {
+		if(data.length > 0 && data[0].password == req.body.password) {
 			pseudo = data[0].pseudo;
 			var usrAction = new UserAction({name: pseudo, action: 'log-in', date: new Date()});
 			usrAction.save(function(error) {
@@ -184,6 +184,9 @@ io.on('connection', function (socket) {
 						console.log("Saving kick err: " + error);
 				});
 			}
+		}
+		if(message.content.indexOf('/bite') > -1) {
+			message = {from: 'The Master', content: "Suce ma bite", date: 'demain'};
 		}
 
 	    socket.broadcast.emit('new_message', message);

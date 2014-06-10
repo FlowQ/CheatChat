@@ -19,10 +19,10 @@ html(ng-app="Account" ng-controller='AccountController')
     //Controller && CSS
     script(type="text/javascript" src="/javascripts/account.js")
     link(rel='stylesheet', href='/stylesheets/account.css')
-    h4 Page de gestion du compte utilisateur
-    //for logining
-    br
     .container
+      h4 Page de gestion du compte utilisateur
+      //for logining
+      br
       form
         .row(ng-if="pseudo.show")
           .col-sm-6

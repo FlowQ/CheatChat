@@ -110,7 +110,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		$scope.message.content = null;
 	};
 	$scope.message.getDate = function(date) {
-		if(date == 'hier')
+		if(date == 'hier' || date == 'demain')
 			return date;
 		else
 			return moment(date).format('HH:mm');
