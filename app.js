@@ -2,9 +2,10 @@ var express = require('express');
 var routes = require('./controllers/routes');
 var mongoose = require('mongoose');
 var msg = require('./models/message').Message
-var usr = require('./models/user').User
+var usrAction = require('./models/userAction').UserAction
 var kck = require('./models/kick').Kick
 var log = require('./models/log').Log
+var usr = require('./models/user').User
 var http = require('http');
 var path = require('path');
 
@@ -49,44 +50,43 @@ process.on('uncaughtException', function(err) {
   process.exit(0);
 });
 
+app.get('/account', routes.account);
 app.get('/m', routes.mobile);
 app.get('/', routes.index);
+app.get('/init', routes.init);
 app.post('/connection', function(req, res) {
 	var pseudo = 'no';
-	//créer tableau avec prénoms en clef puis valeurs en colonnes (pour ajouter les couleurs)
-	switch(req.body.name) {
-		case 'florian':
-			if(req.body.password == 'popo')
-				pseudo = 'Flo';
-			break;
-		case 'constance':
-			if(req.body.password == 'pokipoki')
-				pseudo = 'Cons';
-			break;
-		case 'auriane':
-			if(req.body.password == 'bouboule')
-				pseudo = 'Bru';
-			break;
-		case 'pauline':
-			if(req.body.password == 'constance')
-				pseudo = 'Popy';
-			break;
-		case 'bertrand':
-			if(req.body.password == 'tennis')
-				pseudo = 'Pépé';
-			break;
-		case 'zakaria':
-			if(req.body.password == 'bienoubien')
-				pseudo = 'Zak';
-			break;
-		default: pseudo = 'no';
-	}
-	var usr = new User({name: pseudo, action: 'log-in', date: new Date()});
-	usr.save(function(error) {
-		if(error)
-			console.log('Error log-in saving');
+
+	usr.find({login: req.body.name}).limit(1).exec(function(err, data) {
+		if(data[0].password == req.body.password) {
+			pseudo = data[0].pseudo;
+			var usrAction = new UserAction({name: pseudo, action: 'log-in', date: new Date()});
+			usrAction.save(function(error) {
+				if(error)
+					console.log('Error log-in saving');
+			});
+		}
+		res.send({pseudo: pseudo});
+	});	
+});
+app.post('/changePwd', function(req, res) {
+	console.log('changing password');
+	console.log(req.body);
+	usr.find({login: req.body.login}).limit(1).exec(function(err, data){
+		console.log(data);
+		var ret = 'Error';
+		if(err)
+			console.log('Error in changing password');
+		else {
+			data[0].password = req.body.newPassword;
+			data[0].save(function(err) {
+				if(err) 
+					console.log("Error in saving new pwd");
+				else
+					res.send({status: 'OK'});
+			})
+		}
 	});
-	res.send({pseudo: pseudo});
 });
 
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -98,6 +98,11 @@ var kick = pseudoList;
 var usernames = {};
 // //socket.io
 var io = require('socket.io')(server);
+
+app.get('/panic', function(req, res) {
+	io.emit('panic');
+	res.send('We survived the attack captain!');
+});
 io.on('connection', function (socket) {
 	socket.secure = true;
 	var addedUser = false;
@@ -127,8 +132,8 @@ io.on('connection', function (socket) {
 		if (addedUser) {
 			var pseudo = socket.pseudo;
 			console.log(pseudo + ' is disconnected');
-			var usr = new User({name: pseudo, action: 'log-out', date: new Date()});
-			usr.save(function(error) {
+			var usrAction = new UserAction({name: pseudo, action: 'log-out', date: new Date()});
+			usrAction.save(function(error) {
 				if(error)
 					console.log('Error log-out saving');
 			});
@@ -170,6 +175,7 @@ io.on('connection', function (socket) {
 			if(kick[victim] > Math.floor(Object.size(pseudoList) / 2) - 1) {
 				console.log(victim + ' kicked!');
 				socket.broadcast.emit('kick', {name: victim});
+				socket.emit('kick', {name: victim});
 				kick[victim] = 0;
 				var d = new Date();
 				var saveKick = new kck({last: message.from, victim: victim, date: d});
@@ -180,22 +186,17 @@ io.on('connection', function (socket) {
 			}
 		}
 
-
-
-
 	    socket.broadcast.emit('new_message', message);
-
-
 
 	  // when the client emits 'typing', we broadcast it to others
 	  socket.on('typing', function () {
 	    socket.broadcast.emit('typing', {
-	      pseudo: socket.pseudo
+	      name: socket.pseudo
 	    });
 	  });
-	  socket.on('stop typing', function () {
-	    socket.broadcast.emit('stop typing', {
-	      pseudo: socket.pseudo
+	  socket.on('stop_typing', function () {
+	    socket.broadcast.emit('stop_typing', {
+	      name: socket.pseudo
 	    });
 	  });
 	});

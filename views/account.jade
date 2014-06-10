@@ -1,0 +1,68 @@
+doctype html
+html(ng-app="Account" ng-controller='AccountController')
+  head
+  
+  body
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+
+    script(src="//code.jquery.com/jquery-1.11.0.min.js")
+    script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
+    script(src='http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular.min.js')
+    script(src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular-sanitize.js")
+    script(src="/javascripts/ui-bootstrap-0.11.0.js" type="text/javascript") //stocké en local
+    script(type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js")
+    script(src="/socket.io/socket.io.js")
+    //TOASTR
+    script(src= 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/js/toastr.min.js')
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/css/toastr.min.css" type="text/css" rel="stylesheet")
+
+    //Controller && CSS
+    script(type="text/javascript" src="/javascripts/account.js")
+    link(rel='stylesheet', href='/stylesheets/account.css')
+    h4 Page de gestion du compte utilisateur
+    //for logining
+    br
+    .container
+      form
+        .row(ng-if="pseudo.show")
+          .col-sm-6
+            div.form-group.has-feedback.full-width
+              input.form-control(type="text" id="pseudo-name" ng-model="pseudo.name" placeholder="Your name ...")
+              span.glyphicon.form-control-feedback.hide.full-width
+          .col-sm-5
+            div.form-group.has-feedback.full-width
+              input.form-control(type="password" ng-model="pseudo.password" id="password" placeholder="Your password ...")
+              span.glyphicon.form-control-feedback.hide.full-width
+          .col-sm-1
+            button.btn.btn-default.pull-right(ng-click="pseudo.checkPwd()" ng-disabled="!pseudo.canSubmit()") Go!
+
+
+      //for chatting
+      div(ng-if="!pseudo.show")
+          form.form-group
+            .row
+              .col-sm-4
+                label Pseudo
+              .col-sm-4
+                label Mot de Passe
+              .col-sm-4
+                label Confirmer mot de passe
+            .row
+              .col-sm-4
+                input.form-control(type="text" ng-model="pseudo.pseudo" disabled) 
+              .col-sm-4
+                input.form-control(type="password" ng-model="pseudo.password1")
+              .col-sm-4
+                input.form-control(type="password" ng-model="pseudo.password2")
+            br
+            br
+            .row
+              .col-sm-6
+                button.btn.btn-default.pull-left(ng-click="pseudo.changePwd()" ng-disabled="!pseudo.canChange()") Changer le mot de passe!
+              .col-sm-6
+                a.pull-right
+                  button.btn.btn-default(ng-click="page.go('/m')") Aller au chat!
+      br
+      br
+      br
+      br

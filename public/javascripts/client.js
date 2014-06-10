@@ -1,6 +1,7 @@
 // connect to the socket server
 var socket = io.connect({secure: true});
 window.onerror = function(error, url, line) {
+	console.log('ERROR: ' + error);
 	var d = new Date();
     socket.emit('logs', {type: 'browser', error: error,url: url, line: line, date: d});
 };
@@ -18,13 +19,13 @@ toastr.options = {
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut",
       "ex_title": document.title
-}
+}/*
 toastr.options.onShown = function() { 
 	document.title = 'Notifications!';
 }
 toastr.options.onHidden  = function() { 
 	document.title = toastr.options.ex_title; 
-}
+}*/
 var messageSound = new Audio("double_notif.mp3");
 
 var ChatApp = angular.module('ChatApp', ['ui.bootstrap', 'ngSanitize']);
@@ -92,15 +93,18 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 	$scope.message.sendKey = function (event) {
 		if(event.keyCode == 13 && !event.shiftKey)
-			$scope.message.send()
+			$scope.message.send();
 	}
 	$scope.message.send = function () {
 		if($scope.message.content != null && $scope.message.content != '' && $scope.message.content.length > 0) {
 			var now = new Date();
-			//, css_class: $scope.pseudo.name to add personnalize CSS 
-			var msg = {from: $scope.pseudo.pseudo, content: $scope.message.content, date: now}
+
+			var txt = $scope.message.content;
+			var msg = {from: $scope.pseudo.pseudo, content: txt, date: now};
 			socket.emit('message', msg);
 			msg.from = 'Moi';
+			msg = $scope.message.applyActions(msg);
+			msg.content = $scope.message.trustHTML(msg.content);
 			$scope.message.list.push(msg);
 		}
 		$scope.message.content = null;
@@ -119,38 +123,48 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			messageSound.play();
 		if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
 			$scope.message.newCount++;
+
+		var msg = $scope.message.applyActions(data);
+
+		msg.content = $scope.message.trustHTML(msg.content);
+		$scope.$apply(function() {
+			$scope.message.list.push(msg);
+		});
+	};
+	$scope.message.applyActions = function (data) {
+		
 		//quand quelqu'un te notifie dans la conversation
 		var pseudo = $scope.pseudo.pseudo;
 		var pseudo_woacc = $scope.page.rmAccents(pseudo);
 		var text_lowered = data.content.toLowerCase();
 
 		//règles d'affichage des @lias 
-		if((text_lowered.indexOf('@' + (pseudo).toLowerCase()) > -1) || (text_lowered.indexOf('@' + (pseudo_woacc).toLowerCase()) > -1)) {
+		if((text_lowered.indexOf('@' + (pseudo).toLowerCase()) > -1) || (text_lowered.indexOf('@' + (pseudo_woacc).toLowerCase()) > -1) || (text_lowered.indexOf('@all') > -1)) {
 			var index = text_lowered.indexOf('@' + (pseudo).toLowerCase()) + 2 + (pseudo.length);
 			var shift = data.content.slice(index, index + 25);
-			toastr.success('<p>Tu as été mentionné par ' + data.from + '!</p><p>"<i>' + shift + ' ...</i>"</p><small>' + moment().format('HH:mm') + '</small>');
+			if(data.from != 'Moi')
+				toastr.success('<p>Tu as été mentionné par ' + data.from + '!</p><p>"<i>' + shift + ' ...</i>"</p><small>' + moment().format('HH:mm') + '</small>');
 			data.css_class = 'notified';
 		} else {
 			//juste cité
 			if((text_lowered.indexOf((pseudo).toLowerCase()) > -1) || (text_lowered.indexOf((pseudo_woacc).toLowerCase()) > -1)) {
 				data.css_class = 'quoted';
-			} else {
-				if((text_lowered.indexOf('@timmy') > -1) && pseudo == 'Pépé') {
-					$scope.message.newMessage( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
-				} else {
-					if((text_lowered.indexOf('@geek') > -1) && (pseudo == 'Popy' || pseudo == 'Cons' || pseudo == 'Flo')) {
-						data.css_class = 'geek';
-						console.log('geek');
-						toastr.success('Hey Ho les geeks on vous appelle!');
-					} else {
-						if((text_lowered.indexOf('@boloss') > -1) && (pseudo == 'Bru' || pseudo == 'Pépé')) {
-							data.css_class = 'boloss';
-							toastr.info('Ouesh les bolossss vous êtes où ?!');
-						}
-					}
-				}
 			}
 		}
+		if((text_lowered.indexOf('@timmy') > -1) && pseudo == 'Pépé') {
+			$scope.message.newMessage( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
+		}
+		if((text_lowered.indexOf('@geek') > -1) && (pseudo == 'Popy' || pseudo == 'Cons' || pseudo == 'Flo')) {
+			data.css_class = 'geek';
+			if(data.from != 'Moi')
+				toastr.success('Hey Ho les geeks on vous appelle!');
+		}
+		if((text_lowered.indexOf('@boloss') > -1) && (pseudo == 'Bru' || pseudo == 'Pépé')) {
+			data.css_class = 'boloss';
+			if(data.from != 'Moi')
+				toastr.info('Ouesh les bolossss vous êtes où ?!');
+		}
+
 		var index = text_lowered.indexOf('http://');
 		var index_s = text_lowered.indexOf('https://');
 		if(index > -1 ||  index_s > -1) {
@@ -172,32 +186,50 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 				after_other = '';
 			}
 			data.content = before + ' <a href="' + after_http + '" target="_blank">' + after_http + '</a>' + after_other;
-
-			console.log(data.content);
 		}
-		data.content = $scope.message.trustHTML(data.content);
-		$scope.$apply(function() {
-			$scope.message.list.push(data);
-		});
+
+		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3'];
+		for(poney in keur) {
+			data.content = poneyKeur(keur[poney], data.content);
+		}
+		return data;
 	};
-	$scope.message.trustHTML = function (snippet) {
-		console.log('HERE');
-		return $sce.trustAsHtml(snippet);
+	function poneyKeur (word, text) {
+		var index = text.toLowerCase().indexOf(word);
+		if(index > -1) {
+			after = text.slice(index);
+			before = text.slice(0, index );
+			index = after.indexOf(' ');
+			var keur = null;
+			var after_other = null;
+			if(index != -1) {
+				keur = after.slice(0, index);
+				after_other = after.slice(index);
+			} else { 
+				keur = after;
+				after_other = '';
+			}
+			return before + ' <font color="pink">' + keur + '</font>' + after_other;
+		} else {
+		 	return text;
+		}
 	}
+	$scope.message.trustHTML = function (snippet) {
+		return $sce.trustAsHtml(snippet);
+	};
 	$scope.message.newCount = 0;
 	setInterval(function(){
-		if(document.title != toastr.options.ex_title || $scope.message.newCount == 0) 
-				document.title = toastr.options.ex_title;
-		else {
-			if($scope.message.newCount == 1)
-				document.title = 'Nouveau message';
-			else
-				document.title = $scope.message.newCount + ' nouveaux messages';
+		if($scope.notif.play) {
+			if(document.title != toastr.options.ex_title || $scope.message.newCount == 0) 
+					document.title = toastr.options.ex_title;
+			else {
+				if($scope.message.newCount == 1)
+					document.title = 'Nouveau message';
+				else
+					document.title = $scope.message.newCount + ' nouveaux messages';
+			}
 		}
-
 	}, 1250);
-
-
 
 	$scope.users = {};
 	$scope.users.list = [];
@@ -224,9 +256,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	});
 
 	socket.on('kick', function(data) {
-		console.log('here');
 		var d = new Date();
-		console.log(data.name + ' ' + $scope.pseudo.pseudo);
 		if(data.name.toLowerCase() == $scope.pseudo.pseudo.toLowerCase()) {
 			toastr.error("BIM DEHORS BIATCH :D");
 			toastr.error("T'as la mort hein!");
@@ -273,7 +303,11 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.page.hasFocus = function () {
 		$scope.message.newCount = 0;
 		document.title = toastr.options.ex_title;
+		setTimeout(function(){ toastr.clear() }, 1250);
 	};
+	$scope.page.go = function (path) {
+		document.location.href = path;
+	}
 
 	$scope.sound = {};
 	$scope.sound.ok = 'img/sound.png';
@@ -288,6 +322,22 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		}
 		$scope.sound.play = !$scope.sound.play;
 	};
+	$scope.notif = {};
+	$scope.notif.ok = 'img/notif.png';
+	$scope.notif.mute = 'img/notif_off.png';
+	$scope.notif.img = $scope.notif.ok;
+	$scope.notif.play = true;
+	$scope.notif.click = function () {
+		if($scope.notif.play) {
+			$scope.notif.img = $scope.notif.mute;
+		}else {
+			$scope.notif.img = $scope.notif.ok;
+		}
+		$scope.notif.play = !$scope.notif.play;
+	};
+	socket.on('panic', function() {
+		location.reload(true);
+	});
 });
 /* for time in message
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
@@ -313,3 +363,17 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			}
 		</script>
 */
+
+	//to know who is writing
+	/*$scope.writer = {};
+	$scope.writer.list = {};
+	socket.on('typing', function(data) {
+		$scope.$apply(function() {
+			$scope.writer.list.[data.name] = data.name;
+		});
+	});
+	socket.on('stop_typing', function(data) {
+		$scope.$apply(function() {
+			delete $scope.writer.list.[data.name];
+		});
+	});*/

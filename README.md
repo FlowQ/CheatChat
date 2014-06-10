@@ -3,28 +3,30 @@
 Add :
 	- Typeahead après @
 	- Système d'inscription
-	- changer son pseudo / mdp
 	- grouper quand plusieurs d'affilé du même expéditeur
 	- comtper les gros mots => boite à gros mots
 	- gérer le code
 	- Radio collaborative
 	- distribuer des médailles
-	- coeur <3 keur en rose 
-	- backdoor déco tout le monde
+	- wizz (foutre le dawa dans l'ordre des lettres)
+	- gestion de la connexion continue entre pages
 	
 
 Improve : 
+	- Liste des connectés + couleur dans pseudo quand il écrit
 	- Date
-	- Liste des connectés
 	- historique messages MongoDB 
 	- kick 
 	- son quand mentionné
+	- changer son pseudo
 
 Problems:
-	- crypter les messages	== V || X à checker
+	- crypter les messages	
 
 Done: 
-	- logs des erreurs JS
+	- coeur <3 keur en rose 
+	- backdoor déco tout le monde
+	- logs des erreurs JS => erreurs des couleurs dans dev.jade
 
 
 ====== 
