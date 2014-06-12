@@ -19,13 +19,8 @@ toastr.options = {
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut",
       "ex_title": document.title
-}/*
-toastr.options.onShown = function() { 
-	document.title = 'Notifications!';
 }
-toastr.options.onHidden  = function() { 
-	document.title = toastr.options.ex_title; 
-}*/
+
 var messageSound = new Audio("double_notif.mp3");
 
 var ChatApp = angular.module('ChatApp', ['ui.bootstrap', 'ngSanitize']);
@@ -90,7 +85,8 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 	$scope.message = {};
 	$scope.message.list = [];
-
+	$scope.message.count = 50;
+	$scope.message.key = "thefatchatator";
 	$scope.message.sendKey = function (event) {
 		if(event.keyCode == 13 && !event.shiftKey)
 			$scope.message.send();
@@ -100,11 +96,14 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			var now = new Date();
 
 			var txt = $scope.message.content;
-			var msg = {from: $scope.pseudo.pseudo, content: txt, date: now};
+			var msg = {from: $scope.pseudo.pseudo, content: GibberishAES.enc(txt, $scope.message.key), date: now};
 			socket.emit('message', msg);
 			msg.from = 'Moi';
+			msg.content = txt;
 			msg = $scope.message.applyActions(msg);
+			msg.content = $scope.message.lineBreaks(msg.content);
 			msg.content = $scope.message.trustHTML(msg.content);
+
 			$scope.message.list.push(msg);
 		}
 		$scope.message.content = null;
@@ -123,17 +122,18 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			messageSound.play();
 		if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
 			$scope.message.newCount++;
-
+		data.content = GibberishAES.dec(data.content, $scope.message.key);
 		var msg = $scope.message.applyActions(data);
-
 		msg.content = $scope.message.lineBreaks(msg.content);
 		msg.content = $scope.message.trustHTML(msg.content);
+
 		$scope.$apply(function() {
 			$scope.message.list.push(msg);
 		});
 	};
 	$scope.message.lineBreaks = function (content) {
 		var replaced = '<p>' + content + '</p>';
+		replaced = replaced.replace(/\r\n/g, '</p><p>');
 		return replaced.replace(/\n/g, '</p><p>');
 	}
 	$scope.message.applyActions = function (data) {
@@ -157,7 +157,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			}
 		}
 		if((text_lowered.indexOf('@timmy') > -1) && pseudo == 'Pépé') {
-			$scope.message.newMessage( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
+			$scope.message.list.push( {from: 'The Master', content: "T'es vraiment un gros timmy Bordel de merde :D", date: 'hier'} );
 		}
 		if((text_lowered.indexOf('@geek') > -1) && (pseudo == 'Popy' || pseudo == 'Cons' || pseudo == 'Flo')) {
 			data.css_class = 'geek';
@@ -171,6 +171,12 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		}
 		if(text_lowered.indexOf('/bite') > -1) {
 			data = {from: 'The Master', content: "Suce ma biiiiite", date: 'demain'};
+		}
+		if(text_lowered.indexOf('/relou') > -1) {
+			data = {from: 'The Master', content: "Mais t'es relou bordel :p", date: 'demain'};
+		}
+		if(data.from == pseudo || data.from == 'Moi') {
+			data.from_class = 'moi';
 		}
 
 		var index = text_lowered.indexOf('http://');
@@ -194,6 +200,13 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 				after_other = '';
 			}
 			data.content = before + ' <a href="' + after_http + '" target="_blank">' + after_http + '</a>' + after_other;
+
+			var css = 'linkbox ';
+			if(data.from == pseudo || data.from == 'Moi') {
+				css += 'moi';
+			}
+			$scope.link.list.push( {from: data.from, content: data.content, css: css} );
+			console.log($scope.link.list.length);
 		}
 
 		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3'];
@@ -239,6 +252,10 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		}
 	}, 1250);
 
+	$scope.link = {};
+	$scope.link.list = [];
+
+
 	$scope.users = {};
 	$scope.users.list = [];
 	$scope.users.toShow = '';
@@ -262,20 +279,6 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			$scope.users.updateList();
 		});
 	});
-
-	socket.on('kick', function(data) {
-		var d = new Date();
-		if(data.name.toLowerCase() == $scope.pseudo.pseudo.toLowerCase()) {
-			toastr.error("BIM DEHORS BIATCH :D");
-			toastr.error("T'as la mort hein!");
-			toastr.error("Ahahahahahah");
-			setTimeout(function() { location.reload(true); }, 7000);
-		}
-		else {
-			$scope.message.newMessage({from: 'Master', content: data.name + " s'est fait kicker, bouyaa!", date: d});
-		}
-	});
-
 
 	$scope.page = {};
 	$scope.page.keyPress = function (key) {

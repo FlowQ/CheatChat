@@ -5,7 +5,6 @@ UserSchema = new Schema({
 	login: String,
 	pseudo: String,
 	password: String
-//	date: String
 });
 
 

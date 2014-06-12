@@ -14,6 +14,8 @@ block content
   //TOASTR
   script(src= 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/js/toastr.min.js')
   link(href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.3/css/toastr.min.css" type="text/css" rel="stylesheet")
+  //ENCRYPT
+  script(src="/javascripts/gibberish-aes.js" typ="text/javascript")
 
   //Controller && CSS
   script(type="text/javascript" src="/javascripts/client.js")
@@ -40,7 +42,6 @@ block content
           button.btn.btn-default(ng-click="pseudo.checkPwd()" ng-disabled="!pseudo.canSubmit()") Go!
           button.btn.btn-default.pull-right(ng-click="page.go('/account')") Changer 
 
-
     //for chatting
     div(ng-if="!pseudo.show" collapse="collapse.isCollapsed")
       p Your pseudo: {{pseudo.pseudo}}
@@ -51,14 +52,28 @@ block content
           button.btn.btn-default.pull-right(ng-click="message.send()") Envoyer!
           p {{users.toShow}}
       //the messages are displayed here
-      table.table-condensed(id="zone_chat")
-        tbody
-          tr(ng-repeat='msg in message.list | reverse | limitTo:50 ')
-            td.small {{message.getDate(msg.date)}} 
-            td
-              strong {{msg.from}}
-            td
-              div(ng-bind-html="msg.content" ng-class="msg.css_class")
+      .row
+        .col-sm-10
+          table.table-condensed(id="zone_chat")
+            tbody
+              tr(ng-repeat='msg in message.list | reverse | limitTo:message.count ')
+                td.small {{message.getDate(msg.date)}} 
+                td
+                  strong(ng-class="msg.from_class") {{msg.from}}
+                td
+                  div(ng-bind-html="msg.content" ng-class="msg.css_class")
+        .col-sm-2
+          h4 Link box 
+          br
+          table.table-condensed
+            tbody
+              tr(ng-repeat='lk in link.list | reverse | limitTo:30 ')
+                td
+                  p(ng-class="lk.css") {{lk.from}} =>
+                td
+                  div(ng-bind-html="lk.content")
+          br
+          br
   br
   br
   br

@@ -3,7 +3,6 @@ var routes = require('./controllers/routes');
 var mongoose = require('mongoose');
 var msg = require('./models/message').Message
 var usrAction = require('./models/userAction').UserAction
-var kck = require('./models/kick').Kick
 var log = require('./models/log').Log
 var usr = require('./models/user').User
 var http = require('http');
@@ -54,47 +53,14 @@ app.get('/account', routes.account);
 app.get('/m', routes.mobile);
 app.get('/', routes.index);
 app.get('/init', routes.init);
-app.post('/connection', function(req, res) {
-	var pseudo = 'no';
+app.post('/connection', routes.connection);
+app.post('/changePwd', routes.changePwd);
 
-	usr.find({login: req.body.name}).limit(1).exec(function(err, data) {
-		if(data.length > 0 && data[0].password == req.body.password) {
-			pseudo = data[0].pseudo;
-			var usrAction = new UserAction({name: pseudo, action: 'log-in', date: new Date()});
-			usrAction.save(function(error) {
-				if(error)
-					console.log('Error log-in saving');
-			});
-		}
-		res.send({pseudo: pseudo});
-	});	
-});
-app.post('/changePwd', function(req, res) {
-	console.log('changing password');
-	console.log(req.body);
-	usr.find({login: req.body.login}).limit(1).exec(function(err, data){
-		console.log(data);
-		var ret = 'Error';
-		if(err)
-			console.log('Error in changing password');
-		else {
-			data[0].password = req.body.newPassword;
-			data[0].save(function(err) {
-				if(err) 
-					console.log("Error in saving new pwd");
-				else
-					res.send({status: 'OK'});
-			})
-		}
-	});
-});
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-var pseudoList = {'pepe': 0, 'zak': 0, 'flo': 0, 'popy': 0, 'bru': 0, 'cons': 0};
-var kick = pseudoList;
 var usernames = {};
 // //socket.io
 var io = require('socket.io')(server);
@@ -150,41 +116,6 @@ io.on('connection', function (socket) {
 				console.log("Saving message err: " + error);
 		});
 
-		Object.size = function(obj) {
-		    var size = 0, key;
-		    for (key in obj) {
-		        if (obj.hasOwnProperty(key)) size++;
-		    }
-		    return size;
-		};
-		//for kicking someone
-		var index = message.content.indexOf("kick@");
-		if( index > -1) {
-			var tmp = message.content.slice(index + 5);
-			index = tmp.indexOf(' ');
-			var victim = null;
-			if(index == -1)
-				victim = tmp.slice(0);
-			else
-				victim = tmp.slice(0, index);
-			victim = victim.toLowerCase();
-			var now = new Date();
-			
-			++kick[victim];
-			//si plus de la moitié veut kicker
-			if(kick[victim] > Math.floor(Object.size(pseudoList) / 2) - 1) {
-				console.log(victim + ' kicked!');
-				socket.broadcast.emit('kick', {name: victim});
-				socket.emit('kick', {name: victim});
-				kick[victim] = 0;
-				var d = new Date();
-				var saveKick = new kck({last: message.from, victim: victim, date: d});
-				saveKick.save(function(error) {
-					if(error)
-						console.log("Saving kick err: " + error);
-				});
-			}
-		}
 
 	    socket.broadcast.emit('new_message', message);
 
@@ -201,3 +132,10 @@ io.on('connection', function (socket) {
 	  });
 	});
 });
+
+function decrypt (message) {
+	var node_cryptojs = require('node-cryptojs-aes');
+	var CryptoJS = node_cryptojs.CryptoJS;
+	var decrypted = CryptoJS.AES.decrypt(message, "thefatchatator");
+	console.log("Message decrypte:" + CryptoJS.enc.Utf8.stringify(decrypted));
+}

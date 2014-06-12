@@ -46,16 +46,16 @@ textarea.form-control {
 	padding-right: 5px;
 	padding-bottom: 2px;
 }
-.quoted {
+td div.quoted p{
 	color: #88CCEE;
 }
-.notified {
+td div..notified p{
 	color: #96E476;
 }
-.boloss {
+td div.boloss p{
 	color: rgba(171, 194, 97, 1);
 }
-.geek {
+td div.geek p{
 	color: rgba(255, 102, 102, 1);
 }
 
@@ -72,4 +72,8 @@ img.uiCtrl {
 
 td p{
 	margin: 0px;
+}
+
+.moi {
+	color: rgb(50, 194, 31);
 }
