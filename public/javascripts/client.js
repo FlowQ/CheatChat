@@ -115,7 +115,10 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			return moment(date).format('HH:mm');
 	};
 	socket.on('new_message', function(data) {
-		$scope.message.newMessage(data);
+		if($scope.pseudo.pseudo != null)
+			$scope.message.newMessage(data);
+		else 
+			console.log("ok");
 	});
 	$scope.message.newMessage = function (data) {
 		if($scope.message.newCount < 5 && $scope.sound.play) //pour ne pas harceler
