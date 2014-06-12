@@ -55,6 +55,8 @@ app.get('/', routes.index);
 app.get('/init', routes.init);
 app.post('/connection', routes.connection);
 app.post('/changePwd', routes.changePwd);
+app.get('/new', routes.newUser);
+app.post('/create', routes.createUser);
 
 
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -86,7 +88,7 @@ io.on('connection', function (socket) {
 
 		addedUser = true;
 
-		msg.find().sort({date: -1}).limit(40).exec(function(err, res) {
+		msg.find().sort({date: -1}).limit(user.number).exec(function(err, res) {
 			socket.emit('old_messages', {listMsg: res});
 		});
 		console.log(user.pseudo + ' is connected');

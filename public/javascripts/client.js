@@ -53,7 +53,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
 				});
-				socket.emit('connected', {pseudo: $scope.pseudo.pseudo});
+				socket.emit('connected', {pseudo: $scope.pseudo.pseudo, number: $scope.message.count});
 				toastr.success('Bienvenue ' + $scope.pseudo.pseudo + ', la forme ?');
 				setTimeout(function() { toastr.clear();document.title = toastr.options.ex_title; }, 2500);
 			}
@@ -85,7 +85,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 	$scope.message = {};
 	$scope.message.list = [];
-	$scope.message.count = 50;
+	$scope.message.count = 100;
 	$scope.message.key = "thefatchatator";
 	$scope.message.sendKey = function (event) {
 		if(event.keyCode == 13 && !event.shiftKey)
@@ -100,16 +100,21 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			socket.emit('message', msg);
 			msg.from = 'Moi';
 			msg.content = txt;
+			var privateMsg = isPrivate(msg.content);
 			msg = $scope.message.applyActions(msg);
 			msg.content = $scope.message.lineBreaks(msg.content);
 			msg.content = $scope.message.trustHTML(msg.content);
 
-			$scope.message.list.push(msg);
+			if(privateMsg.priv){
+				$scope.link.list.push(msg);
+			} else {
+				$scope.message.list.push(msg);
+			}
 		}
 		$scope.message.content = null;
 	};
 	$scope.message.getDate = function(date) {
-		if(date == 'hier' || date == 'demain')
+		if(date == 'hier' || date == 'demain' || date == 'le 37 juin')
 			return date;
 		else
 			return moment(date).format('HH:mm');
@@ -124,14 +129,37 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
 			$scope.message.newCount++;
 		data.content = GibberishAES.dec(data.content, $scope.message.key);
+		var privateMsg = isPrivate(data.content);
 		var msg = $scope.message.applyActions(data);
 		msg.content = $scope.message.lineBreaks(msg.content);
-		msg.content = $scope.message.trustHTML(msg.content);
+		
 
 		$scope.$apply(function() {
-			$scope.message.list.push(msg);
+			//effectuer toutes les opérations sur le texte avant cette fonction!!
+			msg.content = $scope.message.trustHTML(msg.content);
+			//case where you are the destinator
+			if(privateMsg.priv && privateMsg.pseudo == $scope.pseudo.pseudo.trim().toLowerCase()){
+				$scope.link.list.push(msg);
+			} else {
+				//case where not private
+				if(!privateMsg.priv)
+					$scope.message.list.push(msg);
+			}
 		});
 	};
+	function isPrivate (content) {
+		var index = content.indexOf('@/');
+		if(index > -1) {
+			var end = content.indexOf(' ', index);
+			var pseudo = null;
+			if(end == -1)
+				pseudo = content.slice(index + 2);
+			else
+				pseudo = content.slice(index + 2, end);
+			return {priv: true, pseudo: pseudo.trim().toLowerCase()};
+		} else
+			return {priv: false} ;
+	}
 	$scope.message.lineBreaks = function (content) {
 		var replaced = '<p>' + content + '</p>';
 		replaced = replaced.replace(/\r\n/g, '</p><p>');
@@ -176,6 +204,9 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		if(text_lowered.indexOf('/relou') > -1) {
 			data = {from: 'The Master', content: "Mais t'es relou bordel :p", date: 'demain'};
 		}
+		if(text_lowered.indexOf('/mad') > -1) {
+			data = {from: 'The Master', content: "U mad Bro ? <img src=\"/img/mad.jpg\" class=\"emoji\"></img>", date: 'le 37 juin'};
+		}
 		if(data.from == pseudo || data.from == 'Moi') {
 			data.from_class = 'moi';
 		}
@@ -206,8 +237,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			if(data.from == pseudo || data.from == 'Moi') {
 				css += 'moi';
 			}
-			$scope.link.list.push( {from: data.from, content: data.content, css: css} );
-			console.log($scope.link.list.length);
+			$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
 		}
 
 		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3'];
@@ -255,7 +285,12 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 	$scope.link = {};
 	$scope.link.list = [];
-
+	$scope.link.show = function () {
+		if($scope.link.list.length > 0)
+			return true;
+		else
+			return false;
+	}
 
 	$scope.users = {};
 	$scope.users.list = [];
@@ -315,7 +350,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.page.hasFocus = function () {
 		$scope.message.newCount = 0;
 		document.title = toastr.options.ex_title;
-		setTimeout(function(){ toastr.clear() }, 1250);
+		setTimeout(function(){ toastr.clear() }, 1750);
 	};
 	$scope.page.go = function (path) {
 		document.location.href = path;

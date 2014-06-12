@@ -50,7 +50,7 @@ td div.quoted p{
 	color: #88CCEE;
 }
 td div.notified p{
-	color: #96E476;
+	color: rgb(61, 67, 214);
 }
 td div.boloss p{
 	color: rgba(171, 194, 97, 1);
@@ -76,4 +76,9 @@ td p{
 
 .moi {
 	color: rgb(50, 194, 31);
+}
+
+.emoji {
+	height: 50px;
+	width: prop;
 }

@@ -2,7 +2,6 @@
 
 Add :
 	- Typeahead après @
-	- Système d'inscription
 	- grouper quand plusieurs d'affilé du même expéditeur
 	- comtper les gros mots => boite à gros mots
 	- Radio collaborative
@@ -10,7 +9,9 @@ Add :
 	- wizz (foutre le dawa dans l'ordre des lettres)
 	- gestion de la connexion continue entre pages
 	- kick
-	- envoyer un message 'perso' (dans link box)
+	- save préférences
+	- lorsque ré-init des comptes, garder le new mdp si différent de celui du script
+	- envoyer tous les soirs tous les liens de la journée
 
 	
 
@@ -22,6 +23,9 @@ Improve :
 	- changer son pseudo (go to chat auto with special url)
 	- gérer le code
 	- link box
+	- règles de gestion dynamique pour les alias etc
+	- envoyer un message 'perso' (dans link box)
+	- Système d'inscription
 
 Problems:
 
@@ -31,6 +35,7 @@ Done:
 	- logs des erreurs JS
 	- crypter les messages
 	- quand reçois message alors que pas connecté ça bug!
+	- U mad bro
 
 
 ====== 

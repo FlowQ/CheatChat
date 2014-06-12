@@ -86,3 +86,32 @@ exports.connection = function(req, res) {
 		res.send({pseudo: pseudo});
 	});	
 };
+
+exports.newUser = function (req, res) {
+	res.render('newUser');
+};
+
+exports.createUser = function (req, res) {
+	var ret = null;
+	usr.find({login: req.body.login}, function(err, data) {
+		if(data.length == 0) {
+			usr.find({pseudo: req.body.pseudo}, function(err, data) {
+				if(err)
+					console.log('Error ' + err);
+				if(data.length == 0) {
+					var newUser = new usr(req.body);
+						newUser.save(function(err) {
+							if(err)
+								console.log(err);
+							else {
+								res.send("ok");
+							}
+						});
+				} else
+					res.send('Pseudo existe déjà');
+			});
+		} else 
+			res.send('Login existe déjà');
+	});
+	
+}
