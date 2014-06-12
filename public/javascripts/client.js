@@ -117,8 +117,6 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	socket.on('new_message', function(data) {
 		if($scope.pseudo.pseudo != null)
 			$scope.message.newMessage(data);
-		else 
-			console.log("ok");
 	});
 	$scope.message.newMessage = function (data) {
 		if($scope.message.newCount < 5 && $scope.sound.play) //pour ne pas harceler
