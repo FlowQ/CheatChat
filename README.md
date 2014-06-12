@@ -10,8 +10,7 @@ Add :
 	- wizz (foutre le dawa dans l'ordre des lettres)
 	- gestion de la connexion continue entre pages
 	- kick
-	- envoyer un message 'perso'
-	- link box
+	- envoyer un message 'perso' (dans link box)
 
 	
 
@@ -22,15 +21,16 @@ Improve :
 	- son quand mentionné
 	- changer son pseudo (go to chat auto with special url)
 	- gérer le code
+	- link box
 
 Problems:
-	- quand reçois message alors que pas connecté ça bug!
 
 Done: 
 	- coeur <3 keur en rose 
 	- backdoor déco tout le monde
 	- logs des erreurs JS
 	- crypter les messages
+	- quand reçois message alors que pas connecté ça bug!
 
 
 ====== 

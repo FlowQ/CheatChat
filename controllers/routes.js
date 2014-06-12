@@ -28,7 +28,8 @@ exports.init = function(req, res){
 				['zakaria', 'bienoubien', 'Zak'],
 				['constance', 'pokipoki', 'Cons'],
 				['pauline', 'constance', 'Popy'],
-				['auriane', 'bouboule', 'Bru']
+				['auriane', 'bouboule', 'Bru'],
+				['laure-anne', 'leonardo', 'LA']
 			];
 	usr.remove({}, function(err) {
 		if(err)	
