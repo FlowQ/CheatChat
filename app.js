@@ -142,7 +142,7 @@ io.on('connection', function (socket) {
 // new CronJob('0 30 20 * * 1-5', function(){
 //     routes.sendMail();
 // }, null, true, "Europe/Paris");
-new CronJob('0 53 23 * * *', function(){
+new CronJob('0 57 23 * * 1-5', function(){
     routes.sendMail();
     console.log('Mail send');
 }, null, true, "Europe/Paris");
