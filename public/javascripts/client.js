@@ -21,7 +21,8 @@ toastr.options = {
       "ex_title": document.title
 }
 
-var messageSound = new Audio("double_notif.mp3");
+var messageSound = new Audio("sounds/double_notif.mp3");
+var applauseSound = new Audio('sounds/applause.mp3');
 
 var ChatApp = angular.module('ChatApp', ['ui.bootstrap', 'ngSanitize']);
 //to reverse the order of the messages
@@ -40,18 +41,29 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.pseudo.pseudo = null; //printed pseudo
 	//login function
 	$scope.pseudo.canSubmit = function() {
-        if($scope.pseudo.name != '' && $scope.pseudo.name != null && $scope.pseudo.name != 'undefined' && $scope.pseudo.password != null && $scope.pseudo.password != ''  && $scope.pseudo.password != 'undefined')
+        if(isOkay($scope.pseudo.name) && isOkay($scope.pseudo.password))
             return true;
         else{
             return false;
         }
 	};
+	function isOkay (str) {
+		if(str != '' && str != null && str != 'undefined')
+			return true;
+		else
+			return false;
+	}
 	$scope.pseudo.checkPwd = function () {
 		$.post('/connection', {name: ($scope.pseudo.name).toLowerCase().trim(), password: $scope.pseudo.password}, function(result) {
 			if(result.pseudo != 'no') {
 				$scope.$apply(function() {
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
+
+					$scope.notif.change(!result.notif);
+					$scope.notif.play = result.notif;
+					$scope.sound.change(!result.sound);
+					$scope.sound.play = result.sound;
 				});
 				socket.emit('connected', {pseudo: $scope.pseudo.pseudo, number: $scope.message.count});
 				toastr.success('Bienvenue ' + $scope.pseudo.pseudo + ', la forme ?');
@@ -69,7 +81,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	socket.on('old_messages', function(data) {
 		data.listMsg.reverse();
 		data.listMsg.forEach(function(message) {
-			$scope.message.newMessage(message);
+			$scope.message.newMessage(message, false);
 		});
 	});
 
@@ -101,7 +113,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			msg.from = 'Moi';
 			msg.content = txt;
 			var privateMsg = isPrivate(msg.content);
-			msg = $scope.message.applyActions(msg);
+			msg = $scope.message.applyActions(msg, true);
 			msg.content = $scope.message.lineBreaks(msg.content);
 			msg.content = $scope.message.trustHTML(msg.content);
 
@@ -114,36 +126,42 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		$scope.message.content = null;
 	};
 	$scope.message.getDate = function(date) {
-		if(date == 'hier' || date == 'demain' || date == 'le 37 juin')
+		if(date == 'hier' || date == 'demain' || date == 'le 37 juin' || date == 'maintenant')
 			return date;
 		else
 			return moment(date).format('HH:mm');
 	};
 	socket.on('new_message', function(data) {
 		if($scope.pseudo.pseudo != null)
-			$scope.message.newMessage(data);
+			$scope.message.newMessage(data, true);
 	});
-	$scope.message.newMessage = function (data) {
-		if($scope.message.newCount < 5 && $scope.sound.play) //pour ne pas harceler
-			messageSound.play();
-		if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
-			$scope.message.newCount++;
+	$scope.message.newMessage = function (data, isNew) {
 		data.content = GibberishAES.dec(data.content, $scope.message.key);
 		var privateMsg = isPrivate(data.content);
-		var msg = $scope.message.applyActions(data);
+		var msg = $scope.message.applyActions(data, isNew);
 		msg.content = $scope.message.lineBreaks(msg.content);
 		
 
 		$scope.$apply(function() {
+			var notify = false;
 			//effectuer toutes les opérations sur le texte avant cette fonction!!
 			msg.content = $scope.message.trustHTML(msg.content);
 			//case where you are the destinator
-			if(privateMsg.priv && privateMsg.pseudo == $scope.pseudo.pseudo.trim().toLowerCase()){
+			if(privateMsg.priv && (privateMsg.pseudo == $scope.pseudo.pseudo.trim().toLowerCase() || msg.from == $scope.pseudo.pseudo)){
 				$scope.link.list.push(msg);
+				notify = true;
 			} else {
 				//case where not private
-				if(!privateMsg.priv)
+				if(!privateMsg.priv) {
+					notify = true;
 					$scope.message.list.push(msg);
+				}
+			}
+			if(notify && isNew) {
+				if($scope.message.newCount < 5 && $scope.sound.play) //pour ne pas harceler
+					messageSound.play();
+				if($('textarea.form-control').is(':focus') == false) //pour éviter qu'il y ait des notifications alors que la fenêtre a le focus
+					$scope.message.newCount++;
 			}
 		});
 	};
@@ -165,7 +183,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		replaced = replaced.replace(/\r\n/g, '</p><p>');
 		return replaced.replace(/\n/g, '</p><p>');
 	}
-	$scope.message.applyActions = function (data) {
+	$scope.message.applyActions = function (data, isNew) {
 		
 		//quand quelqu'un te notifie dans la conversation
 		var pseudo = $scope.pseudo.pseudo;
@@ -207,6 +225,14 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		if(text_lowered.indexOf('/mad') > -1) {
 			data = {from: 'The Master', content: "U mad Bro ? <img src=\"/img/mad.jpg\" class=\"emoji\"></img>", date: 'le 37 juin'};
 		}
+		if(text_lowered.indexOf('/sort') > -1) {
+			var target = text_lowered.slice(5);
+			data = {from: 'Ta maman', content: target + ' tu sors!!', date: 'maintenant'};
+		}
+		if(text_lowered.indexOf('/applause') > -1) {
+			if($scope.sound.play)
+				applauseSound.play();
+		}
 		if(data.from == pseudo || data.from == 'Moi') {
 			data.from_class = 'moi';
 		}
@@ -238,9 +264,13 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 				css += 'moi';
 			}
 			$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
+			var d = moment().format('DDMMYYYY');
+			//save only if new message
+			if(isNew)
+				$.post('/saveLk', {from: pseudo, link: after_http, context: text_lowered, date: parseInt(d)});
 		}
 
-		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3'];
+		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3', 'loutre'];
 		for(poney in keur) {
 			data.content = poneyKeur(keur[poney], data.content);
 		}
@@ -290,7 +320,8 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			return true;
 		else
 			return false;
-	}
+	};
+	$scope.link.count = 30;
 
 	$scope.users = {};
 	$scope.users.list = [];
@@ -361,27 +392,44 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.sound.mute = 'img/mute.png';
 	$scope.sound.img = $scope.sound.ok;
 	$scope.sound.play = true;
-	$scope.sound.click = function () {
-		if($scope.sound.play) {
+	$scope.sound.change = function(state) {
+		if(state) {
 			$scope.sound.img = $scope.sound.mute;
 		}else {
 			$scope.sound.img = $scope.sound.ok;
 		}
+	};
+	$scope.sound.click = function () {
+		$scope.sound.change($scope.sound.play);
 		$scope.sound.play = !$scope.sound.play;
+		$.ajax({
+			type: "PUT",
+			url: "/prefs",
+			data: {state:  $scope.sound.play, pseudo: $scope.pseudo.pseudo, param: 'sounds'}
+		});
 	};
 	$scope.notif = {};
 	$scope.notif.ok = 'img/notif.png';
 	$scope.notif.mute = 'img/notif_off.png';
 	$scope.notif.img = $scope.notif.ok;
 	$scope.notif.play = true;
-	$scope.notif.click = function () {
-		if($scope.notif.play) {
+	$scope.notif.change = function(state) {
+		if(state) {
 			$scope.notif.img = $scope.notif.mute;
 		}else {
 			$scope.notif.img = $scope.notif.ok;
 		}
-		$scope.notif.play = !$scope.notif.play;
 	};
+	$scope.notif.click = function () {
+		$scope.notif.change($scope.notif.play);
+		$scope.notif.play = !$scope.notif.play;
+		$.ajax({
+			type: "PUT",
+			url: "/prefs",
+			data: {state:  $scope.notif.play, pseudo: $scope.pseudo.pseudo, param: 'notifs'}
+		});
+	};
+
 	socket.on('panic', function() {
 		location.reload(true);
 	});

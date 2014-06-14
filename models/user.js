@@ -4,7 +4,9 @@ Schema = mongoose.Schema
 UserSchema = new Schema({
 	login: String,
 	pseudo: String,
-	password: String
+	password: String, 
+	notifs: Boolean,
+	sounds: Boolean
 });
 
 

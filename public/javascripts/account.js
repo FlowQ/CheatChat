@@ -34,12 +34,18 @@ Account.controller('AccountController', function($scope, $sce, $location, $ancho
 	$scope.pseudo.pseudo = null; //printed pseudo
 	//login function
 	$scope.pseudo.canSubmit = function() {
-        if($scope.pseudo.name != '' && $scope.pseudo.name != null && $scope.pseudo.name != 'undefined' && $scope.pseudo.password != null && $scope.pseudo.password != ''  && $scope.pseudo.password != 'undefined')
+        if(isOkay($scope.pseudo.name) && isOkay($scope.pseudo.password))
             return true;
         else{
             return false;
         }
 	};
+	function isOkay (str) {
+		if(str != '' && str != null && str != 'undefined')
+			return true;
+		else
+			return false;
+	}
 	$scope.pseudo.canChange = function() {
         if($scope.pseudo.password1 == $scope.pseudo.password2 && $scope.pseudo.password1 != '' && $scope.pseudo.password1 != null && $scope.pseudo.password1 != 'undefined' && $scope.pseudo.password2 != null && $scope.pseudo.password2 != ''  && $scope.pseudo.password2 != 'undefined')
             return true;

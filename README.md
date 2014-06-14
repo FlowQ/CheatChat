@@ -1,7 +1,6 @@
 "Quand t'es ingénieur t'es un peu con, tu préfères re-coder ton chat plutôt que de t'accomoder de ceux existants"
 
 Add :
-	- Typeahead après @
 	- grouper quand plusieurs d'affilé du même expéditeur
 	- comtper les gros mots => boite à gros mots
 	- Radio collaborative
@@ -9,10 +8,8 @@ Add :
 	- wizz (foutre le dawa dans l'ordre des lettres)
 	- gestion de la connexion continue entre pages
 	- kick
-	- save préférences
 	- lorsque ré-init des comptes, garder le new mdp si différent de celui du script
-	- envoyer tous les soirs tous les liens de la journée
-
+	- voir le dernier message non lu
 	
 
 Improve : 
@@ -26,6 +23,8 @@ Improve :
 	- règles de gestion dynamique pour les alias etc
 	- envoyer un message 'perso' (dans link box)
 	- Système d'inscription
+	- ne pas jouer de son ou notifier quand connexion
+	- envoyer tous les soirs tous les liens de la journée
 
 Problems:
 
@@ -36,6 +35,7 @@ Done:
 	- crypter les messages
 	- quand reçois message alors que pas connecté ça bug!
 	- U mad bro
+	- save préférences
 
 
 ====== 

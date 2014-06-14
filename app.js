@@ -53,11 +53,15 @@ app.get('/account', routes.account);
 app.get('/m', routes.mobile);
 app.get('/', routes.index);
 app.get('/init', routes.init);
+app.get('/new', routes.newUser);
+app.get('/mail', routes.sendMail);
+
 app.post('/connection', routes.connection);
 app.post('/changePwd', routes.changePwd);
-app.get('/new', routes.newUser);
 app.post('/create', routes.createUser);
+app.post('/saveLk', routes.saveLink);
 
+app.put('/prefs', routes.updatePrefs);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

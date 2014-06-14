@@ -2,6 +2,8 @@ var log = require('../models/log').Log
 var usr = require('../models/user').User
 var usrAction = require('../models/userAction').UserAction
 var msg = require('../models/message').Message
+var lk = require('../models/link').Lien
+var mail = require('./mail');
 
 exports.index = function(req, res){
   console.log('desktop');
@@ -39,7 +41,9 @@ exports.init = function(req, res){
 				var saveUser = new usr({
 					login: list[qqun][0],
 					password: list[qqun][1],
-					pseudo: list[qqun][2]
+					pseudo: list[qqun][2], 
+					notifs: true,
+					sounds: true
 				});
 				saveUser.save(function(err) {
 					if(err)
@@ -83,7 +87,7 @@ exports.connection = function(req, res) {
 					console.log('Error log-in saving');
 			});
 		}
-		res.send({pseudo: pseudo});
+		res.send({pseudo: pseudo, notif: data[0].notifs, sound: data[0].sounds});
 	});	
 };
 
@@ -112,6 +116,33 @@ exports.createUser = function (req, res) {
 			});
 		} else 
 			res.send('Login existe déjà');
+	});	
+};
+
+exports.updatePrefs = function (req, res) {
+	usr.find({pseudo: req.body.pseudo}, function(err, data){
+		data[0][req.body.param] = req.body.state;
+		data[0].save(function (err) {
+			if (err) {
+				console.log("Error in saving notif state");
+			};
+		});
 	});
-	
+	res.send('ok');
+};
+
+exports.saveLink = function(req,res) {
+	var saveLk = new lk(req.body);
+	saveLk.save(function(err){
+		if(err)
+			console.log("Error saving link");
+		else
+			console.log('Link saved');
+	});
+};
+
+exports.sendMail = function (req,res) {
+	mail.sendLinks(function(result){
+		res.send(result)
+	});
 }
