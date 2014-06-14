@@ -24,7 +24,7 @@ Improve :
 	- envoyer un message 'perso' (dans link box)
 	- Système d'inscription
 	- ne pas jouer de son ou notifier quand connexion
-	- envoyer tous les soirs tous les liens de la journée
+	- envoyer tous les soirs tous les liens de la journée (adresses mail destination dynamique)
 
 Problems:
 

@@ -139,13 +139,10 @@ io.on('connection', function (socket) {
 	  });
 	});
 });
-// new CronJob('0 30 20 * * 1-5', function(){
-//     routes.sendMail();
-// }, null, true, "Europe/Paris");
-new CronJob('30 59 23 * * 1-6', function(){
+new CronJob('0 30 20 * * 1-5', function(){
     routes.sendMail();
-    console.log('Mail send');
 }, null, true, "Europe/Paris");
+
 
 function decrypt (message) {
 	var node_cryptojs = require('node-cryptojs-aes');

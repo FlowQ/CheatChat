@@ -6,7 +6,7 @@ var user = require('../models/user').User
 var mail = require('../models/mail').Mail
 
 
-var listMails = ['florianquattrocchi@gmail.com'];
+var listMails = ['florianquattrocchi@gmail.com', 'pauline.clavelloux@gmail.com', 'constance.laborie@gmail.com', 'abrusseaux@gmail.com', 'bertrand.dautun@gmail.com'];
 var listMailsStr = '';
 for(var email in listMails) {
 	listMailsStr += (listMails[email] + ',');
@@ -64,7 +64,7 @@ exports.sendLinks = function () {
 	})
 }
 function createBody (cb) {
-	var body = '';
+	var body = '<h3>Coucou, c\'est encore The Master! Voici la liste des liens de la journée: ';
 	user.find({}).sort({pseudo: 1}).exec(function(err, res){
 		async.eachSeries(res, function(person, callback){
 			getLinks(person.pseudo, function (part) {
