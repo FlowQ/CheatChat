@@ -142,7 +142,8 @@ exports.saveLink = function(req,res) {
 };
 
 exports.sendMail = function (req,res) {
-	mail.sendLinks(function(result){
-		res.send(result)
-	});
+	// mail.sendLinks(function(result){
+	// 	res.send(result)
+	// });
+	mail.sendLinks();
 }

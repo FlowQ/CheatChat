@@ -57,10 +57,10 @@ function sendMail (body) {
 function getDate() {
 	return moment().format('DDMMYYYY');
 }
-exports.sendLinks = function (callback) {
+exports.sendLinks = function () {
 	createBody(function (result) {
 		sendMail(result);
-		callback(result);
+		//callback(result);
 	})
 }
 function createBody (cb) {

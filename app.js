@@ -7,6 +7,7 @@ var log = require('./models/log').Log
 var usr = require('./models/user').User
 var http = require('http');
 var path = require('path');
+var CronJob = require('cron').CronJob;
 
 var app = express();
 
@@ -138,6 +139,13 @@ io.on('connection', function (socket) {
 	  });
 	});
 });
+// new CronJob('0 30 20 * * 1-5', function(){
+//     routes.sendMail();
+// }, null, true, "Europe/Paris");
+new CronJob('0 53 23 * * *', function(){
+    routes.sendMail();
+    console.log('Mail send');
+}, null, true, "Europe/Paris");
 
 function decrypt (message) {
 	var node_cryptojs = require('node-cryptojs-aes');
