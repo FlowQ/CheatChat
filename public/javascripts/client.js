@@ -60,12 +60,12 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
 
-					//concats the personal key to enhance security
-					$scope.message.key += $scope.message.keyP;
 					$scope.notif.change(!result.notif);
 					$scope.notif.play = result.notif;
 					$scope.sound.change(!result.sound);
 					$scope.sound.play = result.sound;
+
+					$scope.message.key += $scope.message.keyP;
 				});
 				socket.emit('connected', {pseudo: $scope.pseudo.pseudo, number: $scope.message.count});
 				toastr.success('Bienvenue ' + $scope.pseudo.pseudo + ', la forme ?');
@@ -101,7 +101,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.message.list = [];
 	$scope.message.count = 100;
 	$scope.message.key = "thefatchatator";
-	$socket.message.keyP = "";
+	$scope.message.keyP = '';
 	$scope.message.sendKey = function (event) {
 		if(event.keyCode == 13 && !event.shiftKey)
 			$scope.message.send();
