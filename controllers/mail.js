@@ -60,17 +60,17 @@ function getDate() {
 exports.sendLinks = function () {
 	createBody(function (result) {
 		sendMail(result);
-		//callback(result);
 	})
 }
 function createBody (cb) {
 	var body = '<h3>Coucou, c\'est encore The Master! Voici la liste des liens de la journée: ';
 	user.find({}).sort({pseudo: 1}).exec(function(err, res){
 		async.eachSeries(res, function(person, callback){
-			getLinks(person.pseudo, function (part) {
-				body += part;
-				callback();
-			});
+			if(person.pseudo != 'L-A')
+				getLinks(person.pseudo, function (part) {
+					body += part;
+					callback();
+				});
 
 		}, function(err1) {
 			if(err1)

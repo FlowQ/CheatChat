@@ -60,6 +60,8 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
 
+					//concats the personal key to enhance security
+					$scope.message.key += $scope.message.keyP;
 					$scope.notif.change(!result.notif);
 					$scope.notif.play = result.notif;
 					$scope.sound.change(!result.sound);
@@ -99,6 +101,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.message.list = [];
 	$scope.message.count = 100;
 	$scope.message.key = "thefatchatator";
+	$socket.message.keyP = "";
 	$scope.message.sendKey = function (event) {
 		if(event.keyCode == 13 && !event.shiftKey)
 			$scope.message.send();
@@ -230,7 +233,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			data = {from: 'Ta maman', content: target + ' tu sors!!', date: 'maintenant'};
 		}
 		if(text_lowered.indexOf('/applause') > -1) {
-			if($scope.sound.play)
+			if($scope.sound.play && isNew)
 				applauseSound.play();
 		}
 		if(data.from == pseudo || data.from == 'Moi') {
@@ -266,7 +269,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
 			var d = moment().format('DDMMYYYY');
 			//save only if new message
-			if(isNew)
+			if(isNew && (data.from == pseudo ||  data.from == 'Moi'))
 				$.post('/saveLk', {from: pseudo, link: after_http, context: text_lowered, date: parseInt(d)});
 		}
 
