@@ -103,8 +103,10 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 	$scope.message.key = "thefatchatator";
 	$scope.message.keyP = '';
 	$scope.message.sendKey = function (event) {
-		if(event.keyCode == 13 && !event.shiftKey)
+		if(event.keyCode == 13 && !event.shiftKey) {
+			event.preventDefault();
 			$scope.message.send();
+		}
 	}
 	$scope.message.send = function () {
 		if($scope.message.content != null && $scope.message.content != '' && $scope.message.content.length > 0) {
@@ -139,7 +141,12 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			$scope.message.newMessage(data, true);
 	});
 	$scope.message.newMessage = function (data, isNew) {
-		data.content = GibberishAES.dec(data.content, $scope.message.key);
+		try {
+			data.content = GibberishAES.dec(data.content, $scope.message.key);
+		} catch(err) {
+			$scope.message.list.push({content: "Si des messages incompréhensibles sont affichés c'est que la clef est mauvaise", from: "Maman"});
+			console.log(err);
+		}
 		var privateMsg = isPrivate(data.content);
 		var msg = $scope.message.applyActions(data, isNew);
 		msg.content = $scope.message.lineBreaks(msg.content);
@@ -235,6 +242,10 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		if(text_lowered.indexOf('/applause') > -1) {
 			if($scope.sound.play && isNew)
 				applauseSound.play();
+			$("#chat").snowfall({image :"img/lol.png", minSize: 30, maxSize:62});
+			setTimeout(function () {
+				$('#chat').snowfall('clear');
+			}, 5000);
 		}
 		if(data.from == pseudo || data.from == 'Moi') {
 			data.from_class = 'moi';

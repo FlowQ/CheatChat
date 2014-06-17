@@ -33,7 +33,7 @@ block content
       p Your pseudo: {{pseudo.pseudo}}
       form.form-group.row
         .col-sm-9
-          textarea.form-control(id="txtArea" ng-keyup="message.sendKey($event)" ng-model="message.content" ng-focus="page.hasFocus()" placeholder="Votre message..." row="2" autofocus autocomplete="off")
+          textarea.form-control(id="txtArea" ng-keydown="message.sendKey($event)" ng-model="message.content" ng-focus="page.hasFocus()" placeholder="Votre message..." row="2" autofocus autocomplete="off")
         .col-sm-3
           button.btn.btn-default.pull-right(ng-click="message.send()") Envoyer!
           p {{users.toShow}}

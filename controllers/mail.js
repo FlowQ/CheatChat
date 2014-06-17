@@ -22,17 +22,17 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 
 // setup e-mail data with unicode symbols
 var mailOptions = {
-    from: "The Master <master.flows.services@gmail.com>", // sender address
-    to: listMailsStr, // list of receivers
-    subject: "Today's list ", // Subject line
-    text: "Hello world ✔", // plaintext body
-    html: "<b>Hello world ✔</b>" // html body
+    from: "The Chat Master <master.flows.services@gmail.com>", // sender address
+    //to: listMailsStr, // list of receivers
+    subject: "La liste des liens du jour - ", // Subject line
+    text: "", // plaintext body
+    html: "" // html body
 }
 
-function sendMail (body) {
+function sendMail (body, dest) {
 	mailOptions.subject += moment().format('dddd MMM Do');
 	mailOptions.html = body;
-
+	mailOptions.to = dest;
 	var saveMail = new mail(mailOptions);
 
 	saveMail.save(function (err) {
@@ -59,7 +59,9 @@ function getDate() {
 }
 exports.sendLinks = function () {
 	createBody(function (result) {
-		sendMail(result);
+		for(var dest in listMails){
+			sendMail(result, listMails[dest]);
+		}
 	})
 }
 function createBody (cb) {

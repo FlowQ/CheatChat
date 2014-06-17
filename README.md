@@ -19,11 +19,9 @@ Improve :
 	- son quand mentionné
 	- changer son pseudo (go to chat auto with special url)
 	- gérer le code
-	- link box
 	- règles de gestion dynamique pour les alias etc
 	- envoyer un message 'perso' (dans link box)
 	- Système d'inscription
-	- ne pas jouer de son ou notifier quand connexion
 	- envoyer tous les soirs tous les liens de la journée (adresses mail destination dynamique)
 
 Problems:
@@ -36,6 +34,9 @@ Done:
 	- quand reçois message alors que pas connecté ça bug!
 	- U mad bro
 	- save préférences
+	- snow when applause
+	- double encrypt
+	- ne pas jouer de son ou notifier quand connexion
 
 
 ====== 

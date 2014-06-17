@@ -9,18 +9,13 @@ exports.index = function(req, res){
   console.log('desktop');
   res.render('index', { isMobile: false} );
 };
-
-
 exports.mobile = function(req, res){
   console.log('mobile');
   res.render('index', { isMobile: true} );
 };
-
-
 exports.account = function(req, res){
   res.render('account');
 };
-
 exports.init = function(req, res){
 	var usr,mongoose;
 	usr = require('../models/user').User
@@ -54,7 +49,6 @@ exports.init = function(req, res){
 	});
 	res.send('re-init OK');
 };
-
 exports.changePwd = function(req, res) {
 	console.log('changing password');
 	console.log(req.body);
@@ -74,7 +68,6 @@ exports.changePwd = function(req, res) {
 		}
 	});
 };
-
 exports.connection = function(req, res) {
 	var pseudo = 'no';
 
@@ -90,11 +83,9 @@ exports.connection = function(req, res) {
 		res.send({pseudo: pseudo, notif: data[0].notifs, sound: data[0].sounds});
 	});	
 };
-
 exports.newUser = function (req, res) {
 	res.render('newUser');
 };
-
 exports.createUser = function (req, res) {
 	var ret = null;
 	usr.find({login: req.body.login}, function(err, data) {
@@ -118,7 +109,6 @@ exports.createUser = function (req, res) {
 			res.send('Login existe déjà');
 	});	
 };
-
 exports.updatePrefs = function (req, res) {
 	usr.find({pseudo: req.body.pseudo}, function(err, data){
 		data[0][req.body.param] = req.body.state;
@@ -130,7 +120,6 @@ exports.updatePrefs = function (req, res) {
 	});
 	res.send('ok');
 };
-
 exports.saveLink = function(req,res) {
 	var saveLk = new lk(req.body);
 	saveLk.save(function(err){
@@ -140,7 +129,6 @@ exports.saveLink = function(req,res) {
 			console.log('Link saved');
 	});
 };
-
 exports.sendMail = function (req,res) {
 	mail.sendLinks();
-}
+};
