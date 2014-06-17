@@ -6,6 +6,7 @@ LogSchema = new Schema({
 	error: String,
 	url: String, 
 	line: String,
+	pseudo: String,
 	date: String
 });
 

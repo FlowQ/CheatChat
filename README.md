@@ -16,7 +16,6 @@ Improve :
 	- Liste des connectés + couleur dans pseudo quand il écrit
 	- Date
 	- historique messages MongoDB
-	- son quand mentionné
 	- changer son pseudo (go to chat auto with special url)
 	- gérer le code
 	- règles de gestion dynamique pour les alias etc

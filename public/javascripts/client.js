@@ -1,9 +1,10 @@
 // connect to the socket server
 var socket = io.connect({secure: true});
+var pseudo = "";
 window.onerror = function(error, url, line) {
 	console.log('ERROR: ' + error);
 	var d = new Date();
-    socket.emit('logs', {type: 'browser', error: error,url: url, line: line, date: d});
+    socket.emit('logs', {type: 'browser', error: error,url: url, line: line, date: d, pseudo: pseudo});
 };
 toastr.options = {
       "closeButton": false,
@@ -20,7 +21,6 @@ toastr.options = {
       "hideMethod": "fadeOut",
       "ex_title": document.title
 }
-
 var messageSound = new Audio("sounds/double_notif.mp3");
 var applauseSound = new Audio('sounds/applause.mp3');
 
@@ -59,6 +59,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 				$scope.$apply(function() {
 					$scope.pseudo.show = false;
 					$scope.pseudo.pseudo = result.pseudo;
+					pseudo = result.pseudo;
 
 					$scope.notif.change(!result.notif);
 					$scope.notif.play = result.notif;
