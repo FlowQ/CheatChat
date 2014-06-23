@@ -247,6 +247,8 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			setTimeout(function () {
 				$('#chat').snowfall('clear');
 			}, 5000);
+			data = {from: 'The Clown', content: 'Clap clap clap!', date: 'maintenant'};
+
 		}
 		if(data.from == pseudo || data.from == 'Moi') {
 			data.from_class = 'moi';
