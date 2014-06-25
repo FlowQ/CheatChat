@@ -6,8 +6,8 @@ var user = require('../models/user').User
 var mail = require('../models/mail').Mail
 
 
-//var listMails = ['florianquattrocchi@gmail.com', 'pauline.clavelloux@gmail.com', 'constance.laborie@gmail.com', 'abrusseaux@gmail.com', 'bertrand.dautun@gmail.com'];
-var listMails = ['florianquattrocchi@gmail.com', 'pignonflorian@gmail.com'];
+var listMails = ['florianquattrocchi@gmail.com', 'pauline.clavelloux@gmail.com', 'constance.laborie@gmail.com', 'abrusseaux@gmail.com', 'bertrand.dautun@gmail.com'];
+//var listMails = ['florianquattrocchi@gmail.com', 'pignonflorian@gmail.com']; //DEV
 var listMailsStr = '';
 for(var email in listMails) {
 	listMailsStr += (listMails[email] + ',');
@@ -68,12 +68,12 @@ function createBody (cb) {
 	var body = '<h3>Coucou, c\'est encore The Master! Voici la liste des liens de la journée: ';
 	user.find({}).sort({pseudo: 1}).exec(function(err, res){
 		async.eachSeries(res, function(person, callback){
-			if(person.pseudo != 'L-A' || person.pseudo != 'Geo')
+			if(person.pseudo != 'L-A' || person.pseudo != 'Geo') {
 				getLinks(person.pseudo, function (part) {
 					body += part;
 					callback();
 				});
-
+			}
 		}, function(err1) {
 			if(err1)
 				console.log('Error1: ' + err1);

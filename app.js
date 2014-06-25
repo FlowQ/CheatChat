@@ -139,7 +139,7 @@ io.on('connection', function (socket) {
 	  });
 	});
 });
-new CronJob('0 06 19 * * 1-5', function(){
+new CronJob('0 30 20 * * 1-5', function(){
     routes.sendMail();
     console.log("CRON EXECUTED");
 
