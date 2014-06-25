@@ -130,5 +130,7 @@ exports.saveLink = function(req,res) {
 	});
 };
 exports.sendMail = function (req,res) {
+	if(res)
+		res.send('ok');
 	mail.sendLinks();
 };

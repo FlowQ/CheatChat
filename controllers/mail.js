@@ -6,7 +6,8 @@ var user = require('../models/user').User
 var mail = require('../models/mail').Mail
 
 
-var listMails = ['florianquattrocchi@gmail.com', 'pauline.clavelloux@gmail.com', 'constance.laborie@gmail.com', 'abrusseaux@gmail.com', 'bertrand.dautun@gmail.com'];
+//var listMails = ['florianquattrocchi@gmail.com', 'pauline.clavelloux@gmail.com', 'constance.laborie@gmail.com', 'abrusseaux@gmail.com', 'bertrand.dautun@gmail.com'];
+var listMails = ['florianquattrocchi@gmail.com', 'pignonflorian@gmail.com'];
 var listMailsStr = '';
 for(var email in listMails) {
 	listMailsStr += (listMails[email] + ',');
@@ -23,14 +24,13 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 // setup e-mail data with unicode symbols
 var mailOptions = {
     from: "The Chat Master <master.flows.services@gmail.com>", // sender address
-    //to: listMailsStr, // list of receivers
-    subject: "La liste des liens du jour - ", // Subject line
-    text: "", // plaintext body
-    html: "" // html body
+    to: '',
+    subject: "La liste des liens du jour - " + moment().format('dddd MMM Do'), // Subject line
+    text: '', // plaintext body
+    html: '' // html body
 }
 
 function sendMail (body, dest) {
-	mailOptions.subject += moment().format('dddd MMM Do');
 	mailOptions.html = body;
 	mailOptions.to = dest;
 	var saveMail = new mail(mailOptions);
@@ -50,7 +50,7 @@ function sendMail (body, dest) {
 	    }
 
 	    // if you don't want to use this transport object anymore, uncomment following line
-	    smtpTransport.close(); // shut down the connection pool, no more messages
+	    //smtpTransport.close(); // shut down the connection pool, no more messages
 	});
 }
 
@@ -68,7 +68,7 @@ function createBody (cb) {
 	var body = '<h3>Coucou, c\'est encore The Master! Voici la liste des liens de la journée: ';
 	user.find({}).sort({pseudo: 1}).exec(function(err, res){
 		async.eachSeries(res, function(person, callback){
-			if(person.pseudo != 'L-A')
+			if(person.pseudo != 'L-A' || person.pseudo != 'Geo')
 				getLinks(person.pseudo, function (part) {
 					body += part;
 					callback();
