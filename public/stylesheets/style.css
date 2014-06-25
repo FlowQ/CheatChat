@@ -83,7 +83,7 @@ td p{
 	width: prop;
 }
 
-td div a {
+td div a , td div p {
 	-ms-word-break: break-all;
 
      /* Be VERY careful with this, breaks normal words wh_erever */

@@ -132,7 +132,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		$scope.message.content = null;
 	};
 	$scope.message.getDate = function(date) {
-		if(date == 'hier' || date == 'demain' || date == 'le 37 juin' || date == 'maintenant')
+		if(date == 'hier' || date == 'demain' || date == 'le 37 juin' || date == 'maintenant' || date == 'Noel')
 			return date;
 		else
 			return moment(date).format('HH:mm');
@@ -149,7 +149,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			console.log(err);
 		}
 		var privateMsg = isPrivate(data.content);
-		var msg = $scope.message.applyActions(data, isNew);
+		var msg = $scope.message.applyActions(data, isNew, privateMsg.priv);
 		msg.content = $scope.message.lineBreaks(msg.content);
 		
 
@@ -194,7 +194,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		replaced = replaced.replace(/\r\n/g, '</p><p>');
 		return replaced.replace(/\n/g, '</p><p>');
 	}
-	$scope.message.applyActions = function (data, isNew) {
+	$scope.message.applyActions = function (data, isNew, isPriv) {
 		
 		//quand quelqu'un te notifie dans la conversation
 		var pseudo = $scope.pseudo.pseudo;
@@ -235,6 +235,9 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 		}
 		if(text_lowered.indexOf('/mad') > -1) {
 			data = {from: 'The Master', content: "U mad Bro ? <img src=\"/img/mad.jpg\" class=\"emoji\"></img>", date: 'le 37 juin'};
+		}
+		if(text_lowered.indexOf('/ballec') > -1) {
+			data = {from: 'Toi', content: "Qui s'en fouuuuuuuuut?", date: 'Noel'};
 		}
 		if(text_lowered.indexOf('/sort') > -1) {
 			var target = text_lowered.slice(5);
@@ -280,11 +283,13 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			if(data.from == pseudo || data.from == 'Moi') {
 				css += 'moi';
 			}
-			$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
-			var d = moment().format('DDMMYYYY');
-			//save only if new message
-			if(isNew && (data.from == pseudo ||  data.from == 'Moi'))
-				$.post('/saveLk', {from: pseudo, link: after_http, context: text_lowered, date: parseInt(d)});
+			if(!isPrivate){
+				$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
+				var d = moment().format('DDMMYYYY');
+				//save only if new message
+				if(isNew && (data.from == pseudo ||  data.from == 'Moi'))
+					$.post('/saveLk', {from: pseudo, link: after_http, context: text_lowered, date: parseInt(d)});
+			}
 		}
 
 		var keur = ['keur', 'coeur', 'poney', 'licorne', '<3', 'loutre'];
