@@ -283,7 +283,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			if(data.from == pseudo || data.from == 'Moi') {
 				css += 'moi';
 			}
-			if(!isPrivate){
+			if(!isPriv){
 				$scope.link.list.push( {from: data.from, content: data.content, from_class: css, css_class: data.css_class} );
 				var d = moment().format('DDMMYYYY');
 				//save only if new message
