@@ -8,6 +8,7 @@ var usr = require('./models/user').User
 var http = require('http');
 var path = require('path');
 var CronJob = require('cron').CronJob;
+var nodemailer = require("nodemailer");
 
 var app = express();
 
@@ -137,6 +138,54 @@ io.on('connection', function (socket) {
 	      name: socket.pseudo
 	    });
 	  });
+
+
+	  //envoie un mail à Trello pour ajouter une tâche
+	  socket.on('trello', function (content) {
+	  	var smtpTransport = nodemailer.createTransport("SMTP",{
+		    service: "Gmail",
+		    auth: {
+		        user: "master.flows.services@gmail.com",
+		        pass: "chat2014"
+		    }
+		});
+
+		// setup e-mail data with unicode symbols
+		var mailOptions = {
+		    from: "<master.flows.services@gmail.com>", // sender address
+		    to: 'florianquattrocchi+mrhdcbsa7pvtnfimzpek@boards.trello.com', //adresse de la board 
+		    subject: '', // Subject line
+		    text: '', // plaintext body
+		    html: '' // html body
+		}
+
+		var subject = content.slice(content.indexOf('[') + 1, content.indexOf(']'));
+		var end = content.indexOf(',');
+		var content =  content.slice(content.indexOf('[', end) + 1, content.indexOf(']', end));
+		mailOptions.subject = subject;
+		mailOptions.html = content;
+		mailOptions.text = content;
+		console.log(mailOptions);
+
+		smtpTransport.sendMail(mailOptions, function(error, response){
+		    if(error){
+		        console.log(error);
+		    }else{
+		        console.log("Message sent: " + response.message);
+		    }
+
+		    // if you don't want to use this transport object anymore, uncomment following line
+		    smtpTransport.close(); // shut down the connection pool, no more messages
+		});
+
+
+	  });
+
+
+
+
+
+
 	});
 });
 new CronJob('0 30 20 * * 1-5', function(){

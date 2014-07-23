@@ -257,6 +257,17 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 			data.from_class = 'moi';
 		}
 
+
+		/*
+			Envoyer un message à Trello
+			@trello [titre],[contenu]
+		*/
+		if(text_lowered.indexOf('@trello') > -1) {
+			socket.emit('trello', data.content);
+		}
+
+
+
 		var index = text_lowered.indexOf('http://');
 		var index_s = text_lowered.indexOf('https://');
 		if(index > -1 ||  index_s > -1) {
