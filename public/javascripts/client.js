@@ -100,7 +100,7 @@ ChatApp.controller('chatController', function($scope, $sce, $location, $anchorSc
 
 	$scope.message = {};
 	$scope.message.list = [];
-	$scope.message.count = 500;
+	$scope.message.count = 250;
 	$scope.message.key = "thefatchatator";
 	$scope.message.keyP = '';
 	$scope.message.sendKey = function (event) {
