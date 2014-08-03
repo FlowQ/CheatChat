@@ -17,7 +17,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
     service: "Gmail",
     auth: {
         user: "master.flows.services@gmail.com",
-        pass: "chat2014"
+        pass: "popoetmomo"
     }
 });
 
