@@ -2,7 +2,7 @@ extends conditional_layout
 
 block content
 
-  div(id="chat")
+  div(id="chat" collapse="collapse.isCollapsed")
     .row(ng-show="!pseudo.show")
       label(ng-click="collapse.isCollapsed = !collapse.isCollapsed" ) Les loulouuuuuus
       img.pull-right.uiCtrl(ng-src="{{notif.img}}" ng-click="notif.click()")
@@ -29,7 +29,7 @@ block content
           button.btn.btn-default.pull-right(ng-click="page.go('/account')") Changer 
 
     //for chatting
-    div(ng-if="!pseudo.show" collapse="collapse.isCollapsed")
+    div(ng-if="!pseudo.show")
       p Your pseudo: {{pseudo.pseudo}}
       form.form-group.row
         .col-sm-9
