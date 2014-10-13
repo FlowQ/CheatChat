@@ -51,6 +51,9 @@ block content
         .col-sm-3(ng-show="link.show()")
           table.table-condensed
             tbody
+              br
+              br
+              br
               tr(ng-repeat='lk in link.list | reverse | limitTo:link.count ')
                 td
                   p(ng-class="lk.from_class") {{lk.from}}
