@@ -1,3 +1,5 @@
+Test lol
+
 "Quand t'es ingénieur t'es un peu con, tu préfères re-coder ton chat plutôt que de t'accomoder de ceux existants"
 
 Add :
@@ -10,9 +12,9 @@ Add :
 	- kick
 	- lorsque ré-init des comptes, garder le new mdp si différent de celui du script
 	- voir le dernier message non lu
-	
 
-Improve : 
+
+Improve :
 	- Liste des connectés + couleur dans pseudo quand il écrit
 	- Date
 	- historique messages MongoDB
@@ -25,8 +27,8 @@ Improve :
 
 Problems:
 
-Done: 
-	- coeur <3 keur en rose 
+Done:
+	- coeur <3 keur en rose
 	- backdoor déco tout le monde
 	- logs des erreurs JS
 	- crypter les messages
@@ -38,11 +40,10 @@ Done:
 	- ne pas jouer de son ou notifier quand connexion
 
 
-====== 
+======
 
 Pour Constance :
 	- Stackoverflow => Java
 
-Pour Popy : 
+Pour Popy :
 	- Wikipedia => Accenture
-
